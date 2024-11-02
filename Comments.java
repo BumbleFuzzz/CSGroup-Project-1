@@ -1,3 +1,4 @@
+
 import java.io.*;
 
 public class Comments {
@@ -25,9 +26,9 @@ public class Comments {
 
     // Method to create a file for the comment
     public void createCommentFile() {
-        String filename = "comments/comment-" + commentID + ".txt";
-        File file = new File(filename);
-        try (FileWriter writer = new FileWriter(file)) {
+        String filename =  commentID + ".txt";
+        File file = new File("comments/" + filename) ;
+        try (FileWriter writer = new FileWriter(file)){
             writer.write("Comment ID: " + commentID + "\n");
             writer.write("Date: " + date + "\n");
             writer.write("Time: " + time + "\n");
