@@ -7,16 +7,16 @@ public class User implements UserInterface {
     private String biography;
     private ArrayList<User> blockedUsers;
     private ArrayList<User> friends;
-    // private ArrayList<Post> hiddenPosts;       UNCOMMENT LATER
+    private ArrayList<PostClass> hiddenPosts;
     private static int IDIncrementer = 1; // Used to assign unique userIDs
 
     public User(String username, String password, String biography) {
         this.username = username;
         this.password = password;
         this.biography = biography;
-        blockedUsers = new ArrayList<>();
-        friends = new ArrayList<>();
-        // hiddenPosts = null;   UNCOMMENT LATER
+        blockedUsers = new ArrayList<User>();
+        friends = new ArrayList<User>();
+        hiddenPosts = new ArrayList<PostClass>();
         userID = IDIncrementer;
         IDIncrementer++; // Makes sure that the next user gets a different ID
     }
@@ -46,14 +46,12 @@ public class User implements UserInterface {
     public ArrayList<User> getFriends() {
         return friends;
     }
-    /*
-    public ArrayList<Post> getHiddenPosts() {
+
+    public ArrayList<PostClass> getHiddenPosts() {
         return hiddenPosts;
     }
-    UNCOMMENT WHEN POST CLASS IS ADDED
-    */
-    // SETTER METHODS
 
+    // SETTER METHODS
     public void setName(String username) {
         this.username = username;
     }
@@ -108,11 +106,9 @@ public class User implements UserInterface {
         return (friends.contains(userToCheck));
     }
 
-    /*
-    public void hidePost(Post postToHide) { // Is an error currently, needs Post class to function
+    public void hidePost(PostClass postToHide) { // Is an error currently, needs Post class to function
         hiddenPosts.add(postToHide);
     }
-     */
 
     public boolean loginAttempt(String username, String password) {
         return (username.equals(this.username) && password.equals(this.password));
