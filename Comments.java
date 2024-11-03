@@ -1,5 +1,7 @@
 
 import java.io.*;
+import java.nio.file.*;
+import java.util.*;
 
 public class Comments {
     int commentID;
@@ -23,12 +25,11 @@ public class Comments {
         this.downVotes = 0;
         this.post = post;
     }
-
-    // Method to create a file for the comment
-    public void createCommentFile() {
-        String filename =  commentID + ".txt";
-        File file = new File("comments/" + filename) ;
-        try (FileWriter writer = new FileWriter(file)){
+    
+    public void appendCommentToPostFile() {
+        String filename = "comments/" + post.getPostID() + ".txt"; // Unique file per post
+        File file = new File(filename);
+        try (FileWriter writer = new FileWriter(file, true)) { // Set append mode = true
             writer.write("Comment ID: " + commentID + "\n");
             writer.write("Date: " + date + "\n");
             writer.write("Time: " + time + "\n");
@@ -36,39 +37,110 @@ public class Comments {
             writer.write("Comment Text: " + commentText + "\n");
             writer.write("Upvotes: " + upVotes + "\n");
             writer.write("Downvotes: " + downVotes + "\n");
-            System.out.println("File created: " + filename);
+            writer.write("----------------------------------------------------\n"); 
+            System.out.println("Comment appended to file: " + filename);
         } catch (IOException e) {
-            System.err.println("Error creating file: " + e.getMessage());
+            System.err.println("Error appending to file: " + e.getMessage());
         }
     }
 
-    // Method to delete the comment file (can only be done by post owner or comment owner)
-    public void deleteCommentFile(User requestor) {
+    // Delete a comment from the post file (can only be done by the post owner or comment owner)
+    public void deleteCommentFromPostFile(User requestor) {
         if (requestor.equals(commenter) || requestor.equals(post.getOriginalPoster())) {
-            String filename = "comments/comment-" + commentID + ".txt";
+            String filename = "comments/" + post.getPostID() + ".txt";
             File file = new File(filename);
-            if (file.exists()) {
-                if (file.delete()) {
-                    System.out.println("Comment file deleted: " + filename);
-                } else {
-                    System.err.println("Failed to delete comment file.");
+            List<String> lines = new ArrayList<>();
+            boolean commentFound = false;
+
+            // Read through the file and store lines in a list, excluding the comment to be deleted
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    // Check if the line contains the comment ID
+                    if (line.startsWith("Comment ID: " + commentID)) {
+                        commentFound = true;
+                        // Skip all lines belonging to this comment
+                        for (int i = 0; i < 7; i++) { // Skip the next 7 lines related to this comment
+                            reader.readLine();
+                        }
+                    } else {
+                        lines.add(line); // Add the line as-is if not part of the target comment
+                    }
+                }
+            } catch (IOException e) {
+                System.err.println("Error reading file: " + e.getMessage());
+                return;
+            }
+
+            // If the comment was found, rewrite the file without the deleted comment
+            if (commentFound) {
+                try {
+                    Files.write(file.toPath(), lines);
+                    System.out.println("Comment deleted from file: " + filename);
+                } catch (IOException e) {
+                    System.err.println("Error writing file: " + e.getMessage());
                 }
             } else {
-                System.err.println("Comment file not found.");
+                System.err.println("Comment with ID " + commentID + " not found in file.");
             }
         } else {
             System.err.println("User does not have permission to delete this comment.");
         }
     }
 
-    // Method to increment upVotes
-    public void upvote() {
-        this.upVotes++;
+    // Update the upvote/downvote data in the file by searching for the commentID
+    public void updateCommentVotesInFile() {
+        String filename = "comments/" + post.getPostID() + ".txt";
+        File file = new File(filename);
+        List<String> lines = new ArrayList<>();
+        boolean commentFound = false;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // Check if the line contains the comment ID
+                if (line.startsWith("Comment ID: " + commentID)) {
+                    commentFound = true;
+                    lines.add(line); // Add "Comment ID" line
+                    lines.add(reader.readLine()); // Add "Date" line
+                    lines.add(reader.readLine()); // Add "Time" line
+                    lines.add(reader.readLine()); // Add "Commenter" line
+                    lines.add(reader.readLine()); // Add "Comment Text" line
+                    lines.add("Upvotes: " + upVotes); // Update "Upvotes" line
+                    reader.readLine(); // Skip the old "Upvotes" line
+                    lines.add("Downvotes: " + downVotes); // Update "Downvotes" line
+                    reader.readLine(); // Skip the old "Downvotes" line
+                } else {
+                    lines.add(line); // Add the line as-is if not part of the target comment
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading file: " + e.getMessage());
+            return;
+        }
+
+        if (commentFound) {
+            try {
+                Files.write(file.toPath(), lines);
+                System.out.println("Comment votes updated successfully in file: " + filename);
+            } catch (IOException e) {
+                System.err.println("Error writing file: " + e.getMessage());
+            }
+        } else {
+            System.err.println("Comment with ID " + commentID + " not found in file.");
+        }
     }
 
-    // Method to increment downVotes
+    // Method to increment upVotes and update the file
+    public void upvote() {
+        this.upVotes++;
+        updateCommentVotesInFile();
+    }
+
+    // Method to increment downVotes and update the file
     public void downvote() {
         this.downVotes++;
+        updateCommentVotesInFile();
     }
 
     // Getter methods for all variables
