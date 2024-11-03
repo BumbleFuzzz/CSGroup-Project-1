@@ -1,8 +1,0 @@
-Comment ID: 1
-Date: 2024-11-02
-Time: 10:05
-Commenter: commenter
-Comment Text: This is a test comment.
-Upvotes: 5
-Downvotes: 1
-----------------------------------------------------

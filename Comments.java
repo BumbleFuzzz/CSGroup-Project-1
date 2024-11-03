@@ -14,7 +14,6 @@ public class Comments {
     PostClass post;
     private static int IDIncrementer = 1; // Used to assign unique comment IDs
 
-    // Constructor
     public Comments(String date, String time, User commenter, String commentText, PostClass post) {
         this.commentID = IDIncrementer++;
         this.date = date;
