@@ -88,13 +88,12 @@ public class Comments {
         }
     }
 
-    // Update the upvote/downvote data in the file by searching for the commentID
     public void updateCommentVotesInFile() {
         String filename = "comments/" + post.getPostID() + ".txt";
         File file = new File(filename);
         List<String> lines = new ArrayList<>();
         boolean commentFound = false;
-
+    
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -110,6 +109,7 @@ public class Comments {
                     reader.readLine(); // Skip the old "Upvotes" line
                     lines.add("Downvotes: " + downVotes); // Update "Downvotes" line
                     reader.readLine(); // Skip the old "Downvotes" line
+                    lines.add(reader.readLine()); // Add separator line
                 } else {
                     lines.add(line); // Add the line as-is if not part of the target comment
                 }
@@ -118,7 +118,7 @@ public class Comments {
             System.err.println("Error reading file: " + e.getMessage());
             return;
         }
-
+    
         if (commentFound) {
             try {
                 Files.write(file.toPath(), lines);
@@ -130,6 +130,7 @@ public class Comments {
             System.err.println("Comment with ID " + commentID + " not found in file.");
         }
     }
+    
 
     // Method to increment upVotes and update the file
     public void upvote() {
