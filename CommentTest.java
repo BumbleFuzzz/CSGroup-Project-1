@@ -19,6 +19,8 @@ public class CommentTest {
         comment.downvote();
 
         printFileContents("comments/1.txt");
+        
+        // comment.deleteCommentFromPostFile(commenter);
     }
 
     public static void printFileContents(String filename) {
