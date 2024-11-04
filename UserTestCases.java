@@ -1,5 +1,12 @@
 import java.util.*;
 
+/**
+ * Used specifically to test the User and UserDatabase classes.
+ *
+ * @author Austin Napier
+ * @version November 3, 2024
+ */
+
 public class UserTestCases {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
