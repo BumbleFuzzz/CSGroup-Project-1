@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 
 public class PostClass {
 
@@ -38,10 +39,11 @@ public class PostClass {
             writer.write("Description: " + postDescription + "\n");
             writer.write("Upvotes: " + upVotes + "\n");
             writer.write("Downvotes: " + downVotes + "\n");
-            System.out.println("File created: " + filename);
+            System.out.println("File created/updated: " + filename);
         } catch (IOException e) {
             System.err.println("Error creating file: " + e.getMessage());
         }
+
     }
 
     // Method to delete the file
@@ -62,11 +64,13 @@ public class PostClass {
     // Method to increment upVotes
     public void upvote() {
         this.upVotes++;
+        createPostFile();
     }
 
     // Method to increment downVotes
     public void downvote() {
         this.downVotes++;
+        createPostFile();
     }
 
     // Getter methods for all variables
