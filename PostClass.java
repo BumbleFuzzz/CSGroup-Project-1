@@ -3,7 +3,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-public class PostClass {
+public class PostClass implements PostInterface{
 
     int postID;
     String postDate;
