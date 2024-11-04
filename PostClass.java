@@ -3,6 +3,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Handles the creation and storage of Posts.
+ *
+ * @author Asher Earnhart
+ * @version November 3, 2024
+ */
+
 public class PostClass implements PostInterface{
 
     int postID;
