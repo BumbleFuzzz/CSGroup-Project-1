@@ -1,6 +1,12 @@
 import java.io.*;
 import java.nio.file.*;
 
+/**
+* Handles testing of Comments
+* @author Alice Nguyen
+* @version November 3, 2024
+*/
+
 public class CommentTest {
     public static void main(String[] args) {
         // Set up test data
