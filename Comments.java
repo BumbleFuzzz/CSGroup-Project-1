@@ -3,6 +3,12 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.*;
 
+/**
+* Handles the creation of Comments
+* @author Alice Nguyen
+* @version November 3, 2024
+*/
+
 public class Comments {
     int commentID;
     String date;
