@@ -1,3 +1,10 @@
+/**
+ * Handles the creation and storage of Posts.
+ *
+ * @author Asher Earnhart
+ * @version November 3, 2024
+ */
+
 public interface PostInterface {
 
     // Methods to manage file creation and deletion for the post
