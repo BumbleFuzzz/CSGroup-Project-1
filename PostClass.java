@@ -38,14 +38,14 @@ public class PostClass implements PostInterface{
         String filename = "posts/post-" + postID + ".txt";
         File file = new File(filename);
         try (FileWriter writer = new FileWriter(file)) {
-            writer.write("Post ID: " + postID + "\n");
-            writer.write("Date: " + postDate + "\n");
-            writer.write("Time: " + postTime + "\n");
-            writer.write("Poster: " + originalPoster.getUsername() + "\n");
-            writer.write("Title: " + postTitle + "\n");
-            writer.write("Description: " + postDescription + "\n");
-            writer.write("Upvotes: " + upVotes + "\n");
-            writer.write("Downvotes: " + downVotes + "\n");
+            writer.write( postID + "\n");
+            writer.write(postDate + "\n");
+            writer.write(postTime + "\n");
+            writer.write(originalPoster.getUsername() + "\n");
+            writer.write(postTitle + "\n");
+            writer.write(postDescription + "\n");
+            writer.write(upVotes + "\n");
+            writer.write(downVotes + "\n");
             System.out.println("File created/updated: " + filename);
         } catch (IOException e) {
             System.err.println("Error creating file: " + e.getMessage());
