@@ -36,7 +36,7 @@ The Client class handles the client-side operations and communication with the s
 - ObjectOutputStream outStream: Sends data to the server.
 - ObjectInputStream inStream: Receives data from the server.
 
-###Methods:
+### Methods:
 - sendRequest(Object request): Sends a request to the server and waits for a response.
 - closeConnection(): Closes the connection with the server.
 
