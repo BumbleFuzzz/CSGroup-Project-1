@@ -113,6 +113,10 @@ public class User implements UserInterface {
         return (friends.contains(userToCheck));
     }
 
+    public boolean isBlocked(User userToCheck) {
+        return (blockedUsers.contains(userToCheck));
+    }
+
     public void hidePost(PostClass postToHide) { // Adds post to this user's list of hidden posts
         hiddenPosts.add(postToHide);
     }
