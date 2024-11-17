@@ -1,13 +1,17 @@
 import java.io.*;
 import java.net.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Server implements ServerInterface, Runnable {
     private ConcurrentHashMap<String, User> userDatabase;  // Thread-safe storage
+    private List<User> activeUsers;
     private boolean isRunning = true;
 
     public Server() {
         userDatabase = new ConcurrentHashMap<>();
+        activeUsers = new CopyOnWriteArrayList<>();
     }
 
     public static void main(String[] args) {
@@ -40,13 +44,15 @@ public class Server implements ServerInterface, Runnable {
     }
 
     @Override
-    public boolean addUser(User user) {
-        return false;
+    public void addUser(User user) {
+        // Add user to the activeUsers list
+        activeUsers.add(user);
     }
 
     @Override
-    public boolean removeUser(User user) {
-        return false;
+    public void removeUser(User user) {
+        // Remove user from the activeUsers list
+        activeUsers.remove(user);
     }
 
     @Override
