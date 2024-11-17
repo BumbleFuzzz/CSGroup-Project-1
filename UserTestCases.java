@@ -1,4 +1,6 @@
-import java.util.*;
+import org.junit.jupiter.api.Test;
+import java.io.IOException;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Used specifically to test the User and UserDatabase classes.
@@ -8,44 +10,51 @@ import java.util.*;
  */
 
 public class UserTestCases {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
 
-        System.out.println("Create a new user.");
+    String username = "TestName1";
+    String password = "TestPassword1";
+    String biography = "TestBiography1";
 
-        System.out.println("Input username: ");
-        String username = sc.nextLine();
-        System.out.println("Input password: ");
-        String password = sc.nextLine();
-        System.out.println("Input biography: ");
-        String biography = sc.nextLine();
+    User newTestUser  = new User(username, password, biography);
 
-        User newTestUser = new User(username, password, biography);
+    String username2 = "TestName2";
+    String password2 = "TestPassword2";
+    String biography2 = "TestBiography2";
 
-        System.out.println("This new user's string representation is: ");
+    User newFriendableUser = new User(username2, password2, biography2);
+
+    @Test
+    public void testStringRepresentation() {
+        System.out.println("The first new user's string representation is: ");
         System.out.println(newTestUser);
+        System.out.println("The second new user's string representation is: ");
+        System.out.println(newFriendableUser);
+        assertNotEquals(newTestUser.toString(), newFriendableUser.toString());
+        assertTrue(newTestUser.toString().contains("ID: " + newTestUser.getUserID()));
+        assertTrue(newFriendableUser.toString().contains("ID: " + newFriendableUser.getUserID()));
+    }
 
-        System.out.println("Now create a new user who will friend the other user.");
-
-        System.out.println("Input username: ");
-        username = sc.nextLine();
-        System.out.println("Input password: ");
-        password = sc.nextLine();
-        System.out.println("Input biography: ");
-        biography = sc.nextLine();
-
-        User newFriendableUser = new User(username, password, biography);
-
+    @Test
+    public void testAddFriend() {
         newTestUser.addFriend(newFriendableUser);
-
         System.out.println(newTestUser);
+        assertTrue(newTestUser.isFriend(newFriendableUser));
+        assertTrue(newFriendableUser.isFriend(newTestUser));
+    }
 
+    @Test
+    public void testBlock() {
         System.out.println("The first user will now block the second, also removing them from their friends list.");
 
         newTestUser.blockUser(newFriendableUser);
 
         System.out.println(newTestUser);
+        assertFalse(newTestUser.isFriend(newFriendableUser));
+        assertTrue(newTestUser.isBlocked(newFriendableUser));
+    }
 
+    @Test
+    public void testFileCreation() throws IOException {
         System.out.println("We will now load both of these users into the UserDatabase.");
 
         System.out.println("Database being created...");
@@ -58,5 +67,7 @@ public class UserTestCases {
         newDB.createDatabaseFile();
 
         System.out.println("UserDatabase.txt has been created.");
+        assertNotNull(newDB.getCurrentDBFile());
+        assertTrue(newDB.getCurrentDBFile().exists());
     }
 }
