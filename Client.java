@@ -1,6 +1,13 @@
 import java.io.*;
 import java.net.*;
 
+/**
+ * Handles all interactions on the Client side of the Server/Client System
+ *
+ * @author Asher Earnhart
+ * @version November 17, 2024
+ */
+
 public class Client {
     private Socket socket;
     private ObjectOutputStream outStream;
