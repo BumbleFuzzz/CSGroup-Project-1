@@ -1,6 +1,13 @@
 import java.io.*;
 import java.net.*;
 
+/**
+ * Handles the running of a Client, allows for our Server to host multiple Clients
+ *
+ * @author Asher Earnhart
+ * @version November 17, 2024
+ */
+
 public class ClientHandler implements Runnable {
     private Socket clientSocket;
     private Server server;
