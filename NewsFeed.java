@@ -1,6 +1,13 @@
 import java.io.*;
 import java.util.ArrayList;
 
+/**
+ * Handles the creation of the news feed
+ *
+ * @author Yog Trivedi
+ * @version November 17, 2024
+ */
+
 public class NewsFeed implements NewsFeedInterface
 {
     private ArrayList<String> allPosts;
