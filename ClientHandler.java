@@ -8,7 +8,7 @@ import java.net.*;
  * @version November 17, 2024
  */
 
-public class ClientHandler implements Runnable {
+public class ClientHandler implements Runnable, ClientHandlerInterface {
     private Socket clientSocket;
     private Server server;
     private ObjectOutputStream outStream;
