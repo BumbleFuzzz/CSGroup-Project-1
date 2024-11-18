@@ -8,7 +8,7 @@ import java.util.ArrayList;
  * @version November 3, 2024
  */
 
-public class UserDatabase {
+public class UserDatabase implements UserDatabaseInterface{
     private ArrayList<User> listOfUsers ;
     private File currentDBFile;
 
@@ -48,5 +48,20 @@ public class UserDatabase {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public String databaseFileIntoString() {
+        File databaseFile = new File("UserDatabase.txt");
+        String toReturn = "";
+        
+        try (BufferedReader br = new BufferedReader(new FileReader(databaseFile));) {
+            String line = br.readLine();
+            while (line != null) {
+                toReturn += line + "\n";
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return toReturn;
     }
 }
