@@ -4,6 +4,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * Handles the Server side of the Server/Client System
+ *
+ * @author Asher Earnhart
+ * @version November 17, 2024
+ */
+
 public class Server implements ServerInterface, Runnable {
     private ConcurrentHashMap<String, User> userDatabase;  // Thread-safe storage
     private List<User> activeUsers;
@@ -44,20 +51,28 @@ public class Server implements ServerInterface, Runnable {
     }
 
     @Override
-    public void addUser(User user) {
-        // Add user to the activeUsers list
-        activeUsers.add(user);
+    public boolean addUser(User user) { // Handles the addition of a new user to the database
+        if (user == null) {
+            return false;
+        } else {
+            userDatabase.put(user.getUsername(), user);
+            return true;
+        }
     }
 
     @Override
-    public void removeUser(User user) {
-        // Remove user from the activeUsers list
-        activeUsers.remove(user);
+    public boolean removeUser(User user) { // Handles removal of a user from the database
+        if (userDatabase.containsKey(user.getUsername()) && userDatabase.contains(user)) {
+            userDatabase.remove(user);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
     public User getUser(String username) {
-        return null;
+        return userDatabase.get(username);
     }
 
     @Override
