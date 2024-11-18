@@ -8,7 +8,7 @@ import java.net.*;
  * @version November 17, 2024
  */
 
-public class Client {
+public class Client implements ClientInterface {
     private Socket socket;
     private ObjectOutputStream outStream;
     private ObjectInputStream inStream;
