@@ -9,6 +9,13 @@ import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Testing for the News Feed class
+ *
+ * @author Yog Trivedi
+ * @version November 17, 2024
+ */
+
 class NewsFeedTest {
 
     private NewsFeed newsFeed;
