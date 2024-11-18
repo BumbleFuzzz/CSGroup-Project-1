@@ -9,6 +9,13 @@ import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Test cases for the Post Class
+ *
+ * @author Asher Earnhart
+ * @version November 17, 2024
+ */
+
 public class PostClassTest {
 
     private PostClass post;
