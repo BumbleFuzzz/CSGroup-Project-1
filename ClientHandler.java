@@ -26,17 +26,47 @@ public class ClientHandler implements Runnable, ClientHandlerInterface {
             inStream = new ObjectInputStream(clientSocket.getInputStream());
 
             Object request;
-            while ((request = inStream.readObject()) != null) {
+            while ((request = readRequest()) != null) {
                 server.handleRequest(request, outStream);
             }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         } finally {
             try {
-                clientSocket.close();
+                closeConnection();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    @Override
+    public Object readRequest() throws IOException, ClassNotFoundException {
+        if (inStream == null) {
+            throw new IOException("Input stream is not initialized.");
+        }
+        return inStream.readObject();
+    }
+
+    @Override
+    public void sendResponse(Object response) throws IOException {
+        if (outStream == null) {
+            throw new IOException("Output stream is not initialized.");
+        }
+        outStream.writeObject(response);
+        outStream.flush(); // Ensure the response is sent immediately
+    }
+
+    @Override
+    public void closeConnection() throws IOException {
+        if (clientSocket != null && !clientSocket.isClosed()) {
+            clientSocket.close();
+        }
+        if (inStream != null) {
+            inStream.close();
+        }
+        if (outStream != null) {
+            outStream.close();
         }
     }
 }
