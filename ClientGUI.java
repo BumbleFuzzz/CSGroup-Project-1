@@ -3,10 +3,10 @@ import java.awt.*;
 import java.awt.event.*;
 
 /**
- * A program that serves as a basic painting tool
+ * GUI for the Client of the Social Media Program
  *
  * @author Austin Napier
- * @version 11/14/2024
+ * @version 11/21/2024
  */
 
 public class ClientGUI implements Runnable {
