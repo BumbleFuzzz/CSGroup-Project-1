@@ -126,13 +126,12 @@ public class User implements UserInterface {
     }
 
     public String toString() { // Overrides toString
-        String toReturn = ("Name: " + username + "\nID: " + userID + "\nPassword: " + password + "\nBiography: " + biography + "\nFriends: ");
+        String toReturn = (username + "," + userID + "," + password + "," + biography);
         if (!friends.isEmpty()) {
+            toReturn+= ",";
             for (User friend : friends) {
-                toReturn += friend.username + " - ID: " + friend.userID + "\n";
+                toReturn += "&" + friend.username + "," + friend.userID;
             }
-        } else {
-            toReturn += "No friended users found!\n";
         }
 
         return toReturn;

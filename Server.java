@@ -34,6 +34,7 @@ public class Server implements ServerInterface, Runnable {
             while (isRunning) {
                 Socket clientSocket = serverSocket.accept();
                 new Thread(new ClientHandler(clientSocket, this)).start();
+                System.out.println("Client connected");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -51,22 +52,16 @@ public class Server implements ServerInterface, Runnable {
     }
 
     @Override
-    public boolean addUser(User user) { // Handles the addition of a new user to the database
-        if (user == null) {
-            return false;
-        } else {
+    public void addUser(User user) { // Handles the addition of a new user to the database
+        if (user != null) {
             userDatabase.put(user.getUsername(), user);
-            return true;
         }
     }
 
     @Override
-    public boolean removeUser(User user) { // Handles removal of a user from the database
+    public void removeUser(User user) { // Handles removal of a user from the database
         if (userDatabase.containsKey(user.getUsername()) && userDatabase.contains(user)) {
             userDatabase.remove(user);
-            return true;
-        } else {
-            return false;
         }
     }
 
