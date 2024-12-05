@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 public class UserDatabase implements UserDatabaseInterface{
     private ArrayList<User> listOfUsers ;
     private File currentDBFile;
+    private static Object lock = new Object();
 
     public UserDatabase() { // Initializes a UserDatabase object
         listOfUsers = new ArrayList<User>();
@@ -35,33 +36,35 @@ public class UserDatabase implements UserDatabaseInterface{
 
  
     public static User searchUser(String pUsername) {
-        File databaseFile = new File("UserDatabase.txt");
-        User resultSerachUser = null;
-        try (BufferedReader br = new BufferedReader(new FileReader(databaseFile));) {
-            String line = br.readLine();
-            while (line != null) {
-                if(line.indexOf(pUsername) == 0) {
-                    String[] parts = line.split(",");
-                    String username = parts[0];
-                    String password = parts[1];
-                    String biography = parts[2];
+        synchronized (lock) {
+            File databaseFile = new File("UserDatabase.txt");
+            User resultSerachUser = null;
+            try (BufferedReader br = new BufferedReader(new FileReader(databaseFile));) {
+                String line = br.readLine();
+                while (line != null) {
+                    if(line.indexOf(pUsername) == 0) {
+                        String[] parts = line.split(",");
+                        String username = parts[0];
+                        String password = parts[1];
+                        String biography = parts[2];
 
-                    List<String> friends = new ArrayList<>();
+                        List<String> friends = new ArrayList<>();
 
-                    for (int i = 4; i < parts.length; i += 3) {
-                        if (parts[i].startsWith("&")) {
-                            String friendName = parts[i].substring(1); // Remove the '&'
-                            friends.add(friendName);
+                        for (int i = 4; i < parts.length; i += 3) {
+                            if (parts[i].startsWith("&")) {
+                                String friendName = parts[i].substring(1); // Remove the '&'
+                                friends.add(friendName);
+                            }
                         }
-                    }
 
-                    resultSerachUser =  new User(username, password, biography);
+                        resultSerachUser =  new User(username, password, biography);
+                    }
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+            return resultSerachUser;
         }
-        return resultSerachUser;
     }
 
     public ArrayList<User> getUsers() {
@@ -73,32 +76,36 @@ public class UserDatabase implements UserDatabaseInterface{
     }
 
     public void createDatabaseFile() { // Creates a file containing all the info of every user in this Database's list, which can then be fetched with getCurrentDBFile
-        File databaseFile = new File("UserDatabase.txt");
+        synchronized (lock) {
+            File databaseFile = new File("UserDatabase.txt");
 
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(databaseFile));) {
-            for (User user : listOfUsers) {
-                bw.write(user.toString());
-                bw.write("\n");
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(databaseFile));) {
+                for (User user : listOfUsers) {
+                    bw.write(user.toString());
+                    bw.write("\n");
+                }
+                currentDBFile = databaseFile;
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            currentDBFile = databaseFile;
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
     public String databaseFileIntoString() {
-        File databaseFile = new File("UserDatabase.txt");
-        String toReturn = "";
-        
-        try (BufferedReader br = new BufferedReader(new FileReader(databaseFile));) {
-            String line = br.readLine();
-            while (line != null) {
-                toReturn += line + "\n";
-                line = br.readLine();
+        synchronized (lock) {
+            File databaseFile = new File("UserDatabase.txt");
+            String toReturn = "";
+
+            try (BufferedReader br = new BufferedReader(new FileReader(databaseFile));) {
+                String line = br.readLine();
+                while (line != null) {
+                    toReturn += line + "\n";
+                    line = br.readLine();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+            return toReturn;
         }
-        return toReturn;
     }
 }
