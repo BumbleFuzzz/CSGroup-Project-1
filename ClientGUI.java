@@ -48,6 +48,7 @@ public class ClientGUI implements Runnable {
                 } else {
                     JOptionPane.showMessageDialog(null, "Wrong User/Password! (Hint: try 'test' for both)", "Fail",
                             JOptionPane.ERROR_MESSAGE);
+                    System.exit(0);
                 }
             }
 
@@ -57,6 +58,7 @@ public class ClientGUI implements Runnable {
 
                 if(UserDatabase.searchUser(usernameInput.getText()) != null){
                     JOptionPane.showMessageDialog(null, "User Already Exists, Try Again!", "Error", JOptionPane.ERROR_MESSAGE);
+                    System.exit(0);
                 }
 
                 JOptionPane.showMessageDialog(null, "Success!", "Success",
