@@ -1,6 +1,9 @@
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 
 
 /**
@@ -29,6 +32,17 @@ public class UserDatabase implements UserDatabaseInterface{
     public boolean containsUser(User user) {
         return listOfUsers.contains(user);
     }
+
+ 
+public List<User> searchUsers(Predicate<User> filter) {
+    return listOfUsers.stream()
+                      .filter(filter)
+                      .collect(Collectors.toList());
+}
+
+// Example usage:
+// Searching for a user by username (assuming User class has a getUsername() method)
+// List<User> result = userDatabase.searchUsers(user -> user.getUsername().equalsIgnoreCase("exampleUsername"));
 
     public ArrayList<User> getUsers() {
         return listOfUsers;
