@@ -52,10 +52,9 @@ public class Server implements ServerInterface, Runnable {
     }
 
     @Override
-    public void addUser(User user) { // Handles the addition of a new user to the database
-        if (user != null) {
-            userDatabase.put(user.getUsername(), user);
-        }
+    public void addUser(String username, String password, String bio) { // Handles the addition of a new user to the database
+        User user = new User(username, password, bio);
+        userDatabase.put(user.getUsername(), user);
     }
 
     @Override

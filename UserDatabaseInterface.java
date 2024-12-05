@@ -15,4 +15,8 @@ public interface UserDatabaseInterface {
     public ArrayList<User> getUsers();
     public File getCurrentDBFile();
     public void createDatabaseFile();
+
+    public static User searchUser(String username) {
+        return null;
+    }
 }

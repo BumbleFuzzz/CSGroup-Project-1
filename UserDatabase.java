@@ -34,15 +34,35 @@ public class UserDatabase implements UserDatabaseInterface{
     }
 
  
-public List<User> searchUsers(Predicate<User> filter) {
-    return listOfUsers.stream()
-                      .filter(filter)
-                      .collect(Collectors.toList());
-}
+    public static User searchUser(String pUsername) {
+        File databaseFile = new File("UserDatabase.txt");
+        User resultSerachUser = null;
+        try (BufferedReader br = new BufferedReader(new FileReader(databaseFile));) {
+            String line = br.readLine();
+            while (line != null) {
+                if(line.indexOf(pUsername) == 0) {
+                    String[] parts = line.split(",");
+                    String username = parts[0];
+                    String password = parts[1];
+                    String biography = parts[2];
 
-// Example usage:
-// Searching for a user by username (assuming User class has a getUsername() method)
-// List<User> result = userDatabase.searchUsers(user -> user.getUsername().equalsIgnoreCase("exampleUsername"));
+                    List<String> friends = new ArrayList<>();
+
+                    for (int i = 4; i < parts.length; i += 3) {
+                        if (parts[i].startsWith("&")) {
+                            String friendName = parts[i].substring(1); // Remove the '&'
+                            friends.add(friendName);
+                        }
+                    }
+
+                    resultSerachUser =  new User(username, password, biography);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return resultSerachUser;
+    }
 
     public ArrayList<User> getUsers() {
         return listOfUsers;
@@ -74,6 +94,7 @@ public List<User> searchUsers(Predicate<User> filter) {
             String line = br.readLine();
             while (line != null) {
                 toReturn += line + "\n";
+                line = br.readLine();
             }
         } catch (IOException e) {
             e.printStackTrace();

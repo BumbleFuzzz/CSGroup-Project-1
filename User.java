@@ -9,7 +9,6 @@ import java.util.ArrayList;
 
 public class User implements UserInterface {
     private String username;
-    private int userID;
     private String password;
     private String biography;
     private ArrayList<User> blockedUsers;
@@ -24,7 +23,6 @@ public class User implements UserInterface {
         blockedUsers = new ArrayList<User>();
         friends = new ArrayList<User>();
         hiddenPosts = new ArrayList<PostClass>();
-        userID = IDIncrementer;
         IDIncrementer++; // Makes sure that the next user gets a different ID
     }
 
@@ -32,10 +30,6 @@ public class User implements UserInterface {
 
     public String getUsername() {
         return username;
-    }
-
-    public int getUserID() {
-        return userID;
     }
 
     public String getPassword() {
@@ -61,10 +55,6 @@ public class User implements UserInterface {
     // SETTER METHODS
     public void setName(String username) {
         this.username = username;
-    }
-
-    public void setUserID(int userID) {
-        this.userID = userID;
     }
 
     public void setPassword(String password) {
@@ -126,11 +116,11 @@ public class User implements UserInterface {
     }
 
     public String toString() { // Overrides toString
-        String toReturn = (username + "," + userID + "," + password + "," + biography);
+        String toReturn = (username + "," + password + "," + biography);
         if (!friends.isEmpty()) {
             toReturn+= ",";
             for (User friend : friends) {
-                toReturn += "&" + friend.username + "," + friend.userID;
+                toReturn += "&" + friend.username;
             }
         }
 
@@ -141,6 +131,6 @@ public class User implements UserInterface {
         if (!(o instanceof User)) {
             return false;
         }
-        return (this.userID == ((User) o).userID);
+        return (this.username == ((User) o).username);
     }
 }

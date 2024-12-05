@@ -37,7 +37,7 @@ public class ClientGUI implements Runnable {
             }
 
             if (e.getSource() == loginAttemptButton) {
-                if (usernameInput.getText().equals("test") && passwordInput.getText().equals("test")) {
+                if (UserDatabase.searchUser(usernameInput.getText()).getUsername().equals(usernameInput.getText())) {
                     JOptionPane.showMessageDialog(null, "Success!", "Success",
                             JOptionPane.INFORMATION_MESSAGE);
                     // THIS IS WHERE WE WOULD DIRECT THEM THROUGH INTO THE MAIN MENU WHICH WOULD CONTAIN
@@ -55,11 +55,15 @@ public class ClientGUI implements Runnable {
                 JOptionPane.showMessageDialog(null, "User Created with Username: " + usernameSignupInput.getText() + " and Password: " + passwordSignupInput.getText(), "Fail",
                         JOptionPane.INFORMATION_MESSAGE);
 
-                /*
-                Here we need to add an If statment that will check to see if a user in the database shares
-                its username with the usernameSignupInput.getText() return value
-                If not, then the program will move to create a user
-                 */
+                if(UserDatabase.searchUser(usernameInput.getText()) != null){
+                    JOptionPane.showMessageDialog(null, "User Already Exists, Try Again!", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+
+                JOptionPane.showMessageDialog(null, "Success!", "Success",
+                        JOptionPane.INFORMATION_MESSAGE);
+
+                signupFrame.setVisible(false);
+                //content frame needs to be set up, and shown here
             }
 
         }
