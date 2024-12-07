@@ -27,10 +27,10 @@ class NewsFeedTest {
 
     @Test
     void testAddFriendPost() {
-        newsFeed.addFriendPost("Friend's Post 1");
-        newsFeed.addFriendPost("Friend's Post 2");
+        newsFeed.addFriendPost(new PostClass());
+        newsFeed.addFriendPost(new PostClass());
 
-        ArrayList<String> friendPosts = newsFeed.getFriendPosts();
+        ArrayList<PostClass> friendPosts = newsFeed.getFriendPosts();
         assertEquals(2, friendPosts.size());
         assertTrue(friendPosts.contains("Friend's Post 1"));
         assertTrue(friendPosts.contains("Friend's Post 2"));
@@ -38,19 +38,19 @@ class NewsFeedTest {
 
     @Test
     void testHidePost() {
-        newsFeed.hidePost("Blocked Post");
+        newsFeed.hidePost(new PostClass());
 
-        ArrayList<String> hiddenPosts = newsFeed.getHiddenPosts();
+        ArrayList<PostClass> hiddenPosts = newsFeed.getHiddenPosts();
         assertEquals(1, hiddenPosts.size());
         assertTrue(hiddenPosts.contains("Blocked Post"));
     }
 
     @Test
     void testDisclosePost() {
-        newsFeed.hidePost("Blocked Post");
-        newsFeed.disclosePost("Blocked Post");
+        newsFeed.hidePost(new PostClass());
+        newsFeed.disclosePost(new PostClass());
 
-        ArrayList<String> hiddenPosts = newsFeed.getHiddenPosts();
+        ArrayList<PostClass> hiddenPosts = newsFeed.getHiddenPosts();
         assertEquals(0, hiddenPosts.size());
     }
 
@@ -65,7 +65,7 @@ class NewsFeedTest {
 
         newsFeed.readPostsFromFile(fileName);
 
-        ArrayList<String> allPosts = newsFeed.getAllPosts();
+        ArrayList<PostClass> allPosts = newsFeed.getAllPosts();
         assertEquals(2, allPosts.size());
         assertTrue(allPosts.contains("Post 1"));
         assertTrue(allPosts.contains("Post 2"));
@@ -76,14 +76,14 @@ class NewsFeedTest {
 
     @Test
     void testDisplayFeed() {
-        newsFeed.addFriendPost("Friend's Post 1");
-        newsFeed.hidePost("Blocked Post");
+        newsFeed.addFriendPost(new PostClass());
+        newsFeed.hidePost(new PostClass());
         newsFeed.readPostsFromFile("testPosts.txt");
 
-        ArrayList<String> allPosts = newsFeed.getAllPosts();
-        ArrayList<String> hiddenPosts = newsFeed.getHiddenPosts();
+        ArrayList<PostClass> allPosts = newsFeed.getAllPosts();
+        ArrayList<PostClass> hiddenPosts = newsFeed.getHiddenPosts();
 
-        for (String post : allPosts) {
+        for (PostClass post : allPosts) {
             if (!hiddenPosts.contains(post)) {
                 System.out.println(post);  // Expected to print non-hidden posts only
             }
