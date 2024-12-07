@@ -6,7 +6,7 @@ import java.awt.event.*;
  * GUI for the Client of the Social Media Program
  *
  * @author Austin Napier
- * @version 11/21/2024
+ * @version 12/07/2024
  */
 
 public class ClientGUI implements Runnable {
@@ -26,6 +26,8 @@ public class ClientGUI implements Runnable {
     JTextField userSearchInput;
     JTextArea friendList;
     JTextArea newsFeed;
+    User loggedInUser;
+    NewsFeed userNewsFeed;
 
     /* action listener for buttons */
     ActionListener actionListener = new ActionListener() {
@@ -48,7 +50,7 @@ public class ClientGUI implements Runnable {
                     // THIS IS WHERE WE WOULD DIRECT THEM THROUGH INTO THE MAIN MENU WHICH WOULD CONTAIN
                     // THE FEED, USER SEARCH, FRIENDS LISTS, ETC.
                     // FOR NOW, I JUST MADE IT END THE PROGRAM, PLEASE REMOVE LATER
-
+                    loggedInUser = UserDatabase.searchUser(usernameInput.getText());
                 } else {
                     JOptionPane.showMessageDialog(null, "Wrong User/Password!", "Fail",
                             JOptionPane.ERROR_MESSAGE);
@@ -81,9 +83,30 @@ public class ClientGUI implements Runnable {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new ClientGUI());
     }
-
-
-
+    /*
+    This helper method needs to be called every time the user is directed to the
+    main menu, or every time you need to refresh the main menu for the user
+    */
+    private void mainMenuPopulate() {
+        if (loggedInUser.getFriends() == null || loggedInUser.getFriends().isEmpty()) {
+            friendList.setText("No friended users found!");
+        } else {
+            friendList.setText(loggedInUser.getFriends().toString());
+        }
+        /*
+        
+        This does not compile because of some issues with the NewsFeed class that might need
+        To be reworked, as in we might need to change the newsfeed from storing arrays of Strings
+        into arrays of Posts instead so that this implementation will work. For now, this is just
+        the framework for this helper method. 
+       
+        for (PostClass post : userNewsFeed.getAllPosts()) {
+            if (loggedInUser.getFriends().contains((post.getOriginalPoster()))) {
+                newsFeed.append(post + "\n");
+            }
+        }
+         */
+    }
 
 
     public void run() {
