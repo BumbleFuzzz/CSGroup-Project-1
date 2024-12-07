@@ -33,6 +33,17 @@ public class PostClass implements PostInterface{
         this.downVotes = downVotes;
     }
 
+    public PostClass() {
+        this.postID = -1;
+        this.postDate = null;
+        this.postTime = null;
+        this.originalPoster = null;
+        this.postTitle = null;
+        this.postDescription = null;
+        this.upVotes = 0;
+        this.downVotes = 0;
+    }
+
     // Method to create a file for the post
     public void createPostFile() {
         String filename = "posts/post-" + postID + ".txt";
