@@ -14,16 +14,16 @@ public interface NewsFeedInterface
 
     void displayFeed();
 
-    void addFriendPost(String post);
+    void addFriendPost(PostClass post);
 
-    void hidePost(String post);
+    void hidePost(PostClass post);
 
-    void disclosePost(String post);
+    void disclosePost(PostClass post);
 
-    ArrayList<String> getAllPosts();
+    ArrayList<PostClass> getAllPosts();
 
-    ArrayList<String> getFriendPosts();
+    ArrayList<PostClass> getFriendPosts();
 
-    ArrayList<String> getHiddenPosts();
+    ArrayList<PostClass> getHiddenPosts();
 
 }
