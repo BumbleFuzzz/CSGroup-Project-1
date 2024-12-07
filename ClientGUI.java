@@ -28,6 +28,7 @@ public class ClientGUI implements Runnable {
     JTextArea newsFeed;
     User loggedInUser;
     NewsFeed userNewsFeed;
+    UserDatabase centralUserDatabase = new UserDatabase();
 
     /* action listener for buttons */
     ActionListener actionListener = new ActionListener() {
@@ -44,13 +45,13 @@ public class ClientGUI implements Runnable {
             }
 
             if (e.getSource() == loginAttemptButton) {
-                if (UserDatabase.searchUser(usernameInput.getText()).getUsername().equals(usernameInput.getText())) {
+                if (centralUserDatabase.searchUser(usernameInput.getText()) != null && centralUserDatabase.searchUser(usernameInput.getText()).getUsername().equals(usernameInput.getText())) {
                     JOptionPane.showMessageDialog(null, "Success!", "Success",
                             JOptionPane.INFORMATION_MESSAGE);
                     // THIS IS WHERE WE WOULD DIRECT THEM THROUGH INTO THE MAIN MENU WHICH WOULD CONTAIN
                     // THE FEED, USER SEARCH, FRIENDS LISTS, ETC.
                     // FOR NOW, I JUST MADE IT END THE PROGRAM, PLEASE REMOVE LATER
-                    loggedInUser = UserDatabase.searchUser(usernameInput.getText());
+                    loggedInUser = centralUserDatabase.searchUser(usernameInput.getText());
                 } else {
                     JOptionPane.showMessageDialog(null, "Wrong User/Password!", "Fail",
                             JOptionPane.ERROR_MESSAGE);
@@ -64,7 +65,7 @@ public class ClientGUI implements Runnable {
                 JOptionPane.showMessageDialog(null, "User Created with Username: " + usernameSignupInput.getText() + " and Password: " + passwordSignupInput.getText(), "Fail",
                         JOptionPane.INFORMATION_MESSAGE);
 
-                if(UserDatabase.searchUser(usernameInput.getText()) != null){
+                if(centralUserDatabase.searchUser(usernameInput.getText()) != null){
                     JOptionPane.showMessageDialog(null, "User Already Exists, Try Again!", "Error", JOptionPane.ERROR_MESSAGE);
                     System.exit(0);
                 }
@@ -83,6 +84,7 @@ public class ClientGUI implements Runnable {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new ClientGUI());
     }
+
     /*
     This helper method needs to be called every time the user is directed to the
     main menu, or every time you need to refresh the main menu for the user
@@ -93,19 +95,11 @@ public class ClientGUI implements Runnable {
         } else {
             friendList.setText(loggedInUser.getFriends().toString());
         }
-        /*
-        
-        This does not compile because of some issues with the NewsFeed class that might need
-        To be reworked, as in we might need to change the newsfeed from storing arrays of Strings
-        into arrays of Posts instead so that this implementation will work. For now, this is just
-        the framework for this helper method. 
-       
         for (PostClass post : userNewsFeed.getAllPosts()) {
             if (loggedInUser.getFriends().contains((post.getOriginalPoster()))) {
                 newsFeed.append(post + "\n");
             }
         }
-         */
     }
 
 
