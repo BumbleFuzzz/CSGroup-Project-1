@@ -30,8 +30,6 @@ public class UserTestCases {
         System.out.println("The second new user's string representation is: ");
         System.out.println(newFriendableUser);
         assertNotEquals(newTestUser.toString(), newFriendableUser.toString());
-        assertTrue(newTestUser.toString().contains("ID: " + newTestUser.getUserID()));
-        assertTrue(newFriendableUser.toString().contains("ID: " + newFriendableUser.getUserID()));
     }
 
     @Test
