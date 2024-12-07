@@ -13,14 +13,19 @@ public class ClientGUI implements Runnable {
     JFrame loginOrSignupFrame;
     JFrame loginFrame;
     JFrame signupFrame;
+    JFrame mainMenuFrame;
     JButton loginButton;
     JButton signUpButton;
     JButton loginAttemptButton;
     JButton accountCreationButton;
+    JButton userSearchButton;
     JTextField usernameInput;
     JTextField passwordInput;
     JTextField usernameSignupInput;
     JTextField passwordSignupInput;
+    JTextField userSearchInput;
+    JTextArea friendList;
+    JTextArea newsFeed;
 
     /* action listener for buttons */
     ActionListener actionListener = new ActionListener() {
@@ -43,13 +48,14 @@ public class ClientGUI implements Runnable {
                     // THIS IS WHERE WE WOULD DIRECT THEM THROUGH INTO THE MAIN MENU WHICH WOULD CONTAIN
                     // THE FEED, USER SEARCH, FRIENDS LISTS, ETC.
                     // FOR NOW, I JUST MADE IT END THE PROGRAM, PLEASE REMOVE LATER
-                    loginFrame.setVisible(false);
-                    System.exit(0);
+
                 } else {
-                    JOptionPane.showMessageDialog(null, "Wrong User/Password! (Hint: try 'test' for both)", "Fail",
+                    JOptionPane.showMessageDialog(null, "Wrong User/Password!", "Fail",
                             JOptionPane.ERROR_MESSAGE);
                     System.exit(0);
                 }
+                loginFrame.setVisible(false);
+                mainMenuFrame.setVisible(true);
             }
 
             if (e.getSource() == accountCreationButton) {
@@ -65,6 +71,7 @@ public class ClientGUI implements Runnable {
                         JOptionPane.INFORMATION_MESSAGE);
 
                 signupFrame.setVisible(false);
+                loginOrSignupFrame.setVisible(true);
                 //content frame needs to be set up, and shown here
             }
 
@@ -74,6 +81,8 @@ public class ClientGUI implements Runnable {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new ClientGUI());
     }
+
+
 
 
 
@@ -174,7 +183,42 @@ public class ClientGUI implements Runnable {
         signupMiddlePanel.add(accountCreationButton);
         signupFrame.add(signupMiddlePanel, BorderLayout.CENTER);
 
+        mainMenuFrame = new JFrame("Main Menu");
+        Container mainMenuContent = mainMenuFrame.getContentPane();
+        mainMenuContent.setLayout(new BorderLayout());
 
+        mainMenuFrame.setVisible(false);
+        mainMenuFrame.setBackground(Color.white);
+        mainMenuFrame.setSize(1000,750);
 
+        JPanel mainMenuLeftFriendList = new JPanel();
+        friendList = new JTextArea();
+        friendList.setText("Friends List: \n Friend1 \n Friend2 \n Friend3");
+        friendList.setEditable(false);
+        friendList.setFont(new Font("Serif", Font.BOLD, 35));
+        mainMenuLeftFriendList.add(friendList);
+        mainMenuFrame.add(mainMenuLeftFriendList, BorderLayout.WEST);
+
+        userSearchInput = new JTextField(10);
+        userSearchInput.setFont(new Font("Serif", Font.BOLD, 35));
+        JLabel userSearchHint = new JLabel("User Search: ");
+        JPanel mainMenuUserSearchPanel = new JPanel();
+        mainMenuUserSearchPanel.add(userSearchHint);
+        mainMenuUserSearchPanel.add(userSearchInput);
+        mainMenuFrame.add(mainMenuUserSearchPanel, BorderLayout.NORTH);
+
+        userSearchButton = new JButton("Search");
+        userSearchButton.addActionListener(actionListener);
+        mainMenuUserSearchPanel.add(userSearchButton);
+
+        newsFeed = new JTextArea();
+        newsFeed.setEditable(false);
+        newsFeed.setFont(new Font("Serif", Font.BOLD, 25));
+        newsFeed.setText("This is where the feed will go \n Example: \n \n Post 1 - by username \n \n Post text goes here \n \n Post 2 - by username2 \n \n Other post text goes here");
+
+        JPanel middleMainMenuPanel = new JPanel();
+        middleMainMenuPanel.setLayout(new BorderLayout());
+        middleMainMenuPanel.add(newsFeed);
+        mainMenuFrame.add(middleMainMenuPanel, BorderLayout.CENTER);
     }
 }
