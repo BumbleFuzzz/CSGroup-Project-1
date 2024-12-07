@@ -20,6 +20,7 @@ public class UserDatabase implements UserDatabaseInterface{
 
     public UserDatabase() { // Initializes a UserDatabase object
         listOfUsers = new ArrayList<User>();
+        currentDBFile = new File("UserDatabase.txt");
     }
 
     public void addUser(User user) { // Adds user to the database
@@ -35,11 +36,12 @@ public class UserDatabase implements UserDatabaseInterface{
     }
 
  
-    public static User searchUser(String pUsername) {
+    public User searchUser(String pUsername) {
         synchronized (lock) {
-            File databaseFile = new File("UserDatabase.txt");
+            createDatabaseFile();
+            File databaseFile = this.currentDBFile;
             User resultSerachUser = null;
-            try (BufferedReader br = new BufferedReader(new FileReader(databaseFile));) {
+            try (BufferedReader br = new BufferedReader(new FileReader(this.currentDBFile));) {
                 String line = br.readLine();
                 while (line != null) {
                     if(line.indexOf(pUsername) == 0) {
@@ -60,6 +62,8 @@ public class UserDatabase implements UserDatabaseInterface{
                         resultSerachUser =  new User(username, password, biography);
                     }
                 }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
