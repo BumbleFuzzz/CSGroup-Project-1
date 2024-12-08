@@ -83,11 +83,10 @@ public class UserDatabase implements UserDatabaseInterface{
         synchronized (lock) {
             File databaseFile = new File("UserDatabase.txt");
 
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter(databaseFile));) {
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(databaseFile,true));) {
                 for (User user : listOfUsers) {
                     if (searchUser(user.getUsername()) == null) {
                         bw.write(user.toString());
-                        bw.write("\n");
                     }
                 }
                 currentDBFile = databaseFile;

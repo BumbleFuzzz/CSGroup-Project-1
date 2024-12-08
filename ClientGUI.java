@@ -14,11 +14,13 @@ public class ClientGUI implements Runnable {
     JFrame loginFrame;
     JFrame signupFrame;
     JFrame mainMenuFrame;
+    JFrame profileFrame;
     JButton loginButton;
     JButton signUpButton;
     JButton loginAttemptButton;
     JButton accountCreationButton;
     JButton userSearchButton;
+    JButton profileButton;
     JTextField usernameInput;
     JTextField passwordInput;
     JTextField usernameSignupInput;
@@ -26,6 +28,7 @@ public class ClientGUI implements Runnable {
     JTextField userSearchInput;
     JTextArea friendList;
     JTextArea newsFeed;
+    JTextArea profileName;
     User loggedInUser;
     NewsFeed userNewsFeed;
     UserDatabase centralUserDatabase = new UserDatabase();
@@ -45,14 +48,14 @@ public class ClientGUI implements Runnable {
             }
 
             if (e.getSource() == loginAttemptButton) {
-                System.out.println(centralUserDatabase.searchUser(usernameInput.getText()));
-                if (centralUserDatabase.searchUser(usernameInput.getText()) != null && centralUserDatabase.searchUser(usernameInput.getText()).getUsername().equals(usernameInput.getText())) {
+                if (centralUserDatabase.searchUser(usernameInput.getText()) != null && centralUserDatabase.searchUser(usernameInput.getText()).getUsername().equals(usernameInput.getText()) && centralUserDatabase.searchUser(usernameInput.getText()).getPassword().equals(passwordInput.getText())) {
                     JOptionPane.showMessageDialog(null, "Success!", "Success",
                             JOptionPane.INFORMATION_MESSAGE);
                     // THIS IS WHERE WE WOULD DIRECT THEM THROUGH INTO THE MAIN MENU WHICH WOULD CONTAIN
                     // THE FEED, USER SEARCH, FRIENDS LISTS, ETC.
                     // FOR NOW, I JUST MADE IT END THE PROGRAM, PLEASE REMOVE LATER
                     loggedInUser = centralUserDatabase.searchUser(usernameInput.getText());
+                    System.out.println(loggedInUser.toString());
                 } else {
                     JOptionPane.showMessageDialog(null, "Wrong User/Password!", "Fail",
                             JOptionPane.ERROR_MESSAGE);
@@ -66,7 +69,7 @@ public class ClientGUI implements Runnable {
                 JOptionPane.showMessageDialog(null, "User Created with Username: " + usernameSignupInput.getText() + " and Password: " + passwordSignupInput.getText(), "Created User",
                         JOptionPane.INFORMATION_MESSAGE);
 
-                if(centralUserDatabase.searchUser(usernameInput.getText()) != null){
+                if(centralUserDatabase.searchUser(usernameInput.getText()).getUsername().equals(usernameSignupInput.getText())) {
                     JOptionPane.showMessageDialog(null, "User Already Exists, Try Again!", "Error", JOptionPane.ERROR_MESSAGE);
                     System.exit(0);
                 }
@@ -79,6 +82,12 @@ public class ClientGUI implements Runnable {
 
                 signupFrame.setVisible(false);
                 loginOrSignupFrame.setVisible(true);
+            }
+
+            if (e.getSource() == profileButton) {
+                mainMenuFrame.setVisible(false);
+                profileName.setText("Profile:\n" + loggedInUser.getUsername());
+                profileFrame.setVisible(true);
             }
 
         }
@@ -125,7 +134,7 @@ public class ClientGUI implements Runnable {
         loginButton.addActionListener(actionListener);
         signUpButton = new JButton("Sign Up");
         signUpButton.addActionListener(actionListener);
-        JLabel welcomeMessage = new JLabel("Welcome to our Social Media Service!");
+        JLabel welcomeMessage = new JLabel("Welcome to our FriendFusion!");
         welcomeMessage.setFont(new Font("Serif", Font.BOLD, 25));
 
 
@@ -213,7 +222,7 @@ public class ClientGUI implements Runnable {
 
         JPanel mainMenuLeftFriendList = new JPanel();
         friendList = new JTextArea();
-        friendList.setText("Friends List: \n Friend1 \n Friend2 \n Friend3");
+        friendList.setText("Friends List:");
         friendList.setEditable(false);
         friendList.setFont(new Font("Serif", Font.BOLD, 35));
         mainMenuLeftFriendList.add(friendList);
@@ -231,6 +240,10 @@ public class ClientGUI implements Runnable {
         userSearchButton.addActionListener(actionListener);
         mainMenuUserSearchPanel.add(userSearchButton);
 
+        profileButton = new JButton("My Profile");
+        profileButton.addActionListener(actionListener);
+        mainMenuUserSearchPanel.add(profileButton);
+
         newsFeed = new JTextArea();
         newsFeed.setEditable(false);
         newsFeed.setFont(new Font("Serif", Font.BOLD, 25));
@@ -240,5 +253,23 @@ public class ClientGUI implements Runnable {
         middleMainMenuPanel.setLayout(new BorderLayout());
         middleMainMenuPanel.add(newsFeed);
         mainMenuFrame.add(middleMainMenuPanel, BorderLayout.CENTER);
+
+        profileFrame = new JFrame("Profile");
+        Container profileContent = profileFrame.getContentPane();
+        profileContent.setLayout(new BorderLayout());
+
+        profileFrame.setVisible(false);
+        profileFrame.setBackground(Color.white);
+        profileFrame.setSize(1000,750);
+
+        profileName = new JTextArea();
+        profileName.setEditable(false);
+        profileName.setFont(new Font("Serif", Font.BOLD, 20));
+
+        JPanel profilePanel = new JPanel();
+        profilePanel.setLayout(new BorderLayout());
+        profilePanel.add(profileName);
+        profileFrame.add(profilePanel, BorderLayout.NORTH);
+
     }
 }
