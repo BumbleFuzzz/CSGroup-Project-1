@@ -45,6 +45,7 @@ public class ClientGUI implements Runnable {
             }
 
             if (e.getSource() == loginAttemptButton) {
+                System.out.println(centralUserDatabase.searchUser(usernameInput.getText()));
                 if (centralUserDatabase.searchUser(usernameInput.getText()) != null && centralUserDatabase.searchUser(usernameInput.getText()).getUsername().equals(usernameInput.getText())) {
                     JOptionPane.showMessageDialog(null, "Success!", "Success",
                             JOptionPane.INFORMATION_MESSAGE);
@@ -62,7 +63,7 @@ public class ClientGUI implements Runnable {
             }
 
             if (e.getSource() == accountCreationButton) {
-                JOptionPane.showMessageDialog(null, "User Created with Username: " + usernameSignupInput.getText() + " and Password: " + passwordSignupInput.getText(), "Fail",
+                JOptionPane.showMessageDialog(null, "User Created with Username: " + usernameSignupInput.getText() + " and Password: " + passwordSignupInput.getText(), "Created User",
                         JOptionPane.INFORMATION_MESSAGE);
 
                 if(centralUserDatabase.searchUser(usernameInput.getText()) != null){

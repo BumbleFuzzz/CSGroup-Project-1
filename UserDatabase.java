@@ -59,6 +59,7 @@ public class UserDatabase implements UserDatabaseInterface{
                         }
 
                         resultSerachUser =  new User(username, password, biography);
+                        break;
                     }
                 }
             } catch (FileNotFoundException e) {
