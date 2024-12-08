@@ -38,7 +38,6 @@ public class UserDatabase implements UserDatabaseInterface{
  
     public User searchUser(String pUsername) {
         synchronized (lock) {
-            createDatabaseFile();
             File databaseFile = this.currentDBFile;
             User resultSerachUser = null;
             try (BufferedReader br = new BufferedReader(new FileReader(this.currentDBFile));) {
@@ -85,8 +84,10 @@ public class UserDatabase implements UserDatabaseInterface{
 
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(databaseFile));) {
                 for (User user : listOfUsers) {
-                    bw.write(user.toString());
-                    bw.write("\n");
+                    if (searchUser(user.getUsername()) == null) {
+                        bw.write(user.toString());
+                        bw.write("\n");
+                    }
                 }
                 currentDBFile = databaseFile;
             } catch (IOException e) {

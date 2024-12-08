@@ -45,7 +45,7 @@ public class ClientGUI implements Runnable {
             }
 
             if (e.getSource() == loginAttemptButton) {
-                if (centralUserDatabase.searchUser(usernameInput.getText()) != null && centralUserDatabase.searchUser(usernameInput.getText()).getUsername().equals(usernameInput.getText())) {
+                if (centralUserDatabase.searchUser(usernameInput.getText()).getUsername().equals(usernameInput.getText())) {
                     JOptionPane.showMessageDialog(null, "Success!", "Success",
                             JOptionPane.INFORMATION_MESSAGE);
                     // THIS IS WHERE WE WOULD DIRECT THEM THROUGH INTO THE MAIN MENU WHICH WOULD CONTAIN
@@ -70,12 +70,14 @@ public class ClientGUI implements Runnable {
                     System.exit(0);
                 }
 
+                centralUserDatabase.addUser(new User(usernameSignupInput.getText(), passwordSignupInput.getText(), "Empty"));
+                centralUserDatabase.createDatabaseFile();
+
                 JOptionPane.showMessageDialog(null, "Success!", "Success",
                         JOptionPane.INFORMATION_MESSAGE);
 
                 signupFrame.setVisible(false);
                 loginOrSignupFrame.setVisible(true);
-                //content frame needs to be set up, and shown here
             }
 
         }
