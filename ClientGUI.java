@@ -21,6 +21,8 @@ public class ClientGUI implements Runnable {
     JButton accountCreationButton;
     JButton userSearchButton;
     JButton profileButton;
+    JButton editBioButton;
+    JButton  mainMenuButton;
     JTextField usernameInput;
     JTextField passwordInput;
     JTextField usernameSignupInput;
@@ -29,6 +31,7 @@ public class ClientGUI implements Runnable {
     JTextArea friendList;
     JTextArea newsFeed;
     JTextArea profileName;
+    JTextArea profileBio;
     User loggedInUser;
     NewsFeed userNewsFeed;
     UserDatabase centralUserDatabase = new UserDatabase();
@@ -55,13 +58,13 @@ public class ClientGUI implements Runnable {
                     // THE FEED, USER SEARCH, FRIENDS LISTS, ETC.
                     // FOR NOW, I JUST MADE IT END THE PROGRAM, PLEASE REMOVE LATER
                     loggedInUser = centralUserDatabase.searchUser(usernameInput.getText());
-                    System.out.println(loggedInUser.toString());
                 } else {
                     JOptionPane.showMessageDialog(null, "Wrong User/Password!", "Fail",
                             JOptionPane.ERROR_MESSAGE);
                     System.exit(0);
                 }
                 loginFrame.setVisible(false);
+                //mainMenuPopulate();
                 mainMenuFrame.setVisible(true);
             }
 
@@ -69,7 +72,7 @@ public class ClientGUI implements Runnable {
                 JOptionPane.showMessageDialog(null, "User Created with Username: " + usernameSignupInput.getText() + " and Password: " + passwordSignupInput.getText(), "Created User",
                         JOptionPane.INFORMATION_MESSAGE);
 
-                if(centralUserDatabase.searchUser(usernameInput.getText()).getUsername().equals(usernameSignupInput.getText())) {
+                if(centralUserDatabase.searchUser(usernameInput.getText()) != null && centralUserDatabase.searchUser(usernameInput.getText()).getUsername().equals(usernameSignupInput.getText())) {
                     JOptionPane.showMessageDialog(null, "User Already Exists, Try Again!", "Error", JOptionPane.ERROR_MESSAGE);
                     System.exit(0);
                 }
@@ -87,7 +90,24 @@ public class ClientGUI implements Runnable {
             if (e.getSource() == profileButton) {
                 mainMenuFrame.setVisible(false);
                 profileName.setText("Profile:\n" + loggedInUser.getUsername());
+                profileBio.setText("Biography:\n" + loggedInUser.getBiography());
                 profileFrame.setVisible(true);
+            }
+
+            if (e.getSource() == mainMenuButton) {
+                profileFrame.setVisible(false);
+                //mainMenuPopulate();
+                mainMenuFrame.setVisible(true);
+            }
+
+            if (e.getSource() == editBioButton) {
+                profileFrame.setVisible(false);
+                loggedInUser.setBiography(JOptionPane.showInputDialog(null, "Enter New Biography", "Edit Biography",
+                        JOptionPane.PLAIN_MESSAGE));
+                System.out.println(loggedInUser.getBiography());
+                centralUserDatabase.addUser(loggedInUser);
+                centralUserDatabase.updateDatabaseFile();
+
             }
 
         }
@@ -134,7 +154,7 @@ public class ClientGUI implements Runnable {
         loginButton.addActionListener(actionListener);
         signUpButton = new JButton("Sign Up");
         signUpButton.addActionListener(actionListener);
-        JLabel welcomeMessage = new JLabel("Welcome to our FriendFusion!");
+        JLabel welcomeMessage = new JLabel("Welcome to FriendFusion!");
         welcomeMessage.setFont(new Font("Serif", Font.BOLD, 25));
 
 
@@ -266,10 +286,26 @@ public class ClientGUI implements Runnable {
         profileName.setEditable(false);
         profileName.setFont(new Font("Serif", Font.BOLD, 20));
 
-        JPanel profilePanel = new JPanel();
-        profilePanel.setLayout(new BorderLayout());
-        profilePanel.add(profileName);
-        profileFrame.add(profilePanel, BorderLayout.NORTH);
+        mainMenuButton = new JButton("Main Menu");
+        mainMenuButton.addActionListener(actionListener);
+        editBioButton = new JButton("Edit");
+        editBioButton.addActionListener(actionListener);
+
+        JPanel profileNamePanel = new JPanel();
+        profileNamePanel.setLayout(new BorderLayout());
+        profileNamePanel.add(profileName);
+        profileNamePanel.add(mainMenuButton, BorderLayout.EAST);
+        profileFrame.add(profileNamePanel, BorderLayout.NORTH);
+
+        profileBio = new JTextArea();
+        profileBio.setEditable(false);
+        profileBio.setFont(new Font("Serif", Font.PLAIN,15));
+
+        JPanel profileBioPanel = new JPanel();
+        profileBioPanel.setLayout(new BorderLayout());
+        profileBioPanel.add(editBioButton, BorderLayout.SOUTH);
+        profileBioPanel.add(profileBio);
+        profileFrame.add(profileBioPanel);
 
     }
 }

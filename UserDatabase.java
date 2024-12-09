@@ -35,7 +35,7 @@ public class UserDatabase implements UserDatabaseInterface{
         return listOfUsers.contains(user);
     }
 
- 
+
     public User searchUser(String pUsername) {
         synchronized (lock) {
             File databaseFile = this.currentDBFile;
@@ -61,6 +61,7 @@ public class UserDatabase implements UserDatabaseInterface{
                         resultSerachUser =  new User(username, password, biography);
                         break;
                     }
+                    line = br.readLine();
                 }
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -83,10 +84,11 @@ public class UserDatabase implements UserDatabaseInterface{
         synchronized (lock) {
             File databaseFile = new File("UserDatabase.txt");
 
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter(databaseFile,true));) {
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(databaseFile,true))) {
                 for (User user : listOfUsers) {
                     if (searchUser(user.getUsername()) == null) {
                         bw.write(user.toString());
+                        bw.write("\n");
                     }
                 }
                 currentDBFile = databaseFile;
@@ -95,6 +97,51 @@ public class UserDatabase implements UserDatabaseInterface{
             }
         }
     }
+
+    public void updateDatabaseFile() {
+        synchronized (lock) {
+            File databaseFile = new File("UserDatabase.txt");
+            List<String> updatedLines = new ArrayList<>();
+
+            try (BufferedReader br = new BufferedReader(new FileReader(databaseFile))) {
+                String line;
+
+                // Read the file line by line
+                while ((line = br.readLine()) != null) {
+                    boolean userFound = false;
+
+                    // Check if the line corresponds to an existing user
+                    for (User user : listOfUsers) {
+                        if (line.startsWith(user.getUsername() + ",")) { // Assuming the username starts each line
+                            updatedLines.add(user.toString()); // Overwrite with updated user data
+                            userFound = true;
+                            break;
+                        }
+                    }
+
+                    // If the line doesn't correspond to an existing user, keep it as is
+                    if (!userFound) {
+                        updatedLines.add(line);
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(databaseFile, false))) {
+                // Write back all updated lines
+                for (String updatedLine : updatedLines) {
+                    bw.write(updatedLine);
+                    bw.write("\n");
+                }
+                currentDBFile = databaseFile;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 
     public String databaseFileIntoString() {
         synchronized (lock) {
