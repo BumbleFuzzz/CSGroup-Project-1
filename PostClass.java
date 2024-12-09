@@ -19,10 +19,12 @@ public class PostClass implements PostInterface{
     int upVotes;
     int downVotes;
     String filename;
+    static int postIDIncrementor = 1;
 
     // Constructor
     public PostClass(User originalPoster, String postTitle, String postDescription, int upVotes, int downVotes) {
-        this.postID = postID;
+        postID = postIDIncrementor;
+        postIDIncrementor++;
         this.originalPoster = originalPoster;
         this.postTitle = postTitle;
         this.postDescription = postDescription;
