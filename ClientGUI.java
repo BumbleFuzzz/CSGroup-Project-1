@@ -17,6 +17,7 @@ public class ClientGUI implements Runnable {
     JFrame mainMenuFrame;
     JFrame profileFrame;
     JFrame otherProfileFrame;
+    JFrame createPostFrame;
     JButton loginButton;
     JButton signUpButton;
     JButton loginAttemptButton;
@@ -29,11 +30,14 @@ public class ClientGUI implements Runnable {
     JButton block;
     JButton friend;
     JButton createPostButton;
+    JButton confirmPostCreationButton;
     JTextField usernameInput;
     JTextField passwordInput;
     JTextField usernameSignupInput;
     JTextField passwordSignupInput;
     JTextField userSearchInput;
+    JTextField createPostTitle;
+    JTextField createPostDescription;
     JTextArea friendList;
     JTextArea newsFeed;
     JTextArea profileName;
@@ -148,6 +152,18 @@ public class ClientGUI implements Runnable {
                 mainMenuFrame.setVisible(true);
             }
 
+            if (e.getSource() == createPostButton) {
+                createPostFrame.setVisible(true);
+            }
+
+            if (e.getSource() == confirmPostCreationButton) {
+                PostClass newPost = new PostClass(loggedInUser, createPostTitle.getText(), createPostDescription.getText(), 0, 0);
+                newPost.createPostFile();
+                userNewsFeed.addPost(newPost);
+                JOptionPane.showMessageDialog(null, "Success!", "Success",
+                        JOptionPane.INFORMATION_MESSAGE);
+                createPostFrame.setVisible(false);
+            }
         }
     };
 
@@ -400,6 +416,31 @@ public class ClientGUI implements Runnable {
         otherProfileBioPanel.setLayout(new BorderLayout(100,100));
         otherProfileBioPanel.add(otherProfileBio);
         otherProfileFrame.add(otherProfileBioPanel);
+
+        createPostFrame = new JFrame("Create Post");
+        createPostFrame.setSize(750,300);
+        Container createPostFrameContent = createPostFrame.getContentPane();
+        createPostFrameContent.setLayout(new BorderLayout());
+        createPostFrame.setVisible(false);
+
+        createPostTitle = new JTextField();
+        createPostDescription = new JTextField();
+
+        createPostTitle.setText("Post title goes here!");
+        createPostTitle.setFont(new Font("Serif", Font.PLAIN,50));
+        createPostDescription.setText("Post description goes here!");
+        createPostDescription.setFont(new Font("Serif", Font.PLAIN,35));
+
+        confirmPostCreationButton = new JButton("Create Post");
+        confirmPostCreationButton.addActionListener(actionListener);
+
+        JPanel createPostCentralPanel = new JPanel();
+        createPostCentralPanel.add(createPostTitle);
+        createPostCentralPanel.add(createPostDescription);
+        createPostCentralPanel.add(confirmPostCreationButton);
+
+        createPostFrame.add(createPostCentralPanel, BorderLayout.CENTER);
+
 
     }
 }

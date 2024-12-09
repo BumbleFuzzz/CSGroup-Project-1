@@ -25,7 +25,7 @@ public class PostClassTest {
     void setUp() {
         // Assuming User class has a constructor User(String username)
         User user = new User("testUser","hi","no boi");
-        post = new PostClass(1, "2024-11-03", "10:00 AM", user, "Test Post", "This is a test post.", 0, 0);
+        post = new PostClass(user, "Test Post", "This is a test post.", 0, 0);
     }
 
     @AfterEach

@@ -20,7 +20,7 @@ public class PostClass implements PostInterface{
     int downVotes;
 
     // Constructor
-    public PostClass(int postID, String postDate, String postTime, User originalPoster, String postTitle, String postDescription, int upVotes, int downVotes) {
+    public PostClass(User originalPoster, String postTitle, String postDescription, int upVotes, int downVotes) {
         this.postID = postID;
         this.originalPoster = originalPoster;
         this.postTitle = postTitle;
