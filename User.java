@@ -96,7 +96,7 @@ public class User implements UserInterface {
         }
     }
 
-    public boolean isFriend(User userToCheck) { // Checks to see if the two users are friended to each other
+    public boolean isFriend(String userToCheck) { // Checks to see if the two users are friended to each other
         return (friends.contains(userToCheck));
     }
 
@@ -114,9 +114,9 @@ public class User implements UserInterface {
 
     public String toString() { // Overrides toString
         String toReturn = (username + "," + password + "," + biography);
-        if (!friends.isEmpty()) {
+        if (!getFriends().isEmpty()) {
             toReturn+= ",";
-            for (String friend : friends) {
+            for (String friend : getFriends()) {
                 toReturn += "&" + friend;
             }
         }

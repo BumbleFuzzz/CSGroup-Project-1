@@ -17,8 +17,6 @@ public interface PostInterface {
 
     // Getter methods for all variables
     int getPostID();
-    String getPostDate();
-    String getPostTime();
     User getOriginalPoster();
     String getPostTitle();
     String getPostDescription();

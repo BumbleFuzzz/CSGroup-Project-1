@@ -125,7 +125,7 @@ public class UserDatabase implements UserDatabaseInterface{
                     // Check if the line corresponds to an existing user
                     for (User user : listOfUsers) {
                         if (line.startsWith(user.getUsername() + ",")) { // Assuming the username starts each line
-                            updatedLines.add(user.toString()); // Overwrite with updated user data
+                            updatedLines.add(user.toString()); // Overwrite with updated user data\
                             userFound = true;
                             break;
                         }

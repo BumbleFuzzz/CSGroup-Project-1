@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 
 /**
  * GUI for the Client of the Social Media Program
@@ -23,9 +24,11 @@ public class ClientGUI implements Runnable {
     JButton userSearchButton;
     JButton profileButton;
     JButton editBioButton;
-    JButton  mainMenuButton;
+    JButton ownProfileMainMenuButton;
+    JButton otherProfileMainMenuButton;
     JButton block;
     JButton friend;
+    JButton createPostButton;
     JTextField usernameInput;
     JTextField passwordInput;
     JTextField usernameSignupInput;
@@ -38,7 +41,7 @@ public class ClientGUI implements Runnable {
     JTextArea otherProfileName;
     JTextArea otherProfileBio;
     User loggedInUser;
-    NewsFeed userNewsFeed;
+    NewsFeed userNewsFeed = new NewsFeed();
     UserDatabase centralUserDatabase = new UserDatabase();
 
     /* action listener for buttons */
@@ -94,12 +97,19 @@ public class ClientGUI implements Runnable {
 
             if (e.getSource() == profileButton) {
                 mainMenuFrame.setVisible(false);
-                ProfilePopulate();
+                profileName.setText("Profile:\n" + loggedInUser.getUsername());
+                profileBio.setText("Biography:\n" + loggedInUser.getBiography());
                 profileFrame.setVisible(true);
             }
 
-            if (e.getSource() == mainMenuButton) {
+            if (e.getSource() == ownProfileMainMenuButton) {
                 profileFrame.setVisible(false);
+                mainMenuPopulate();
+                mainMenuFrame.setVisible(true);
+            }
+
+            if (e.getSource() == otherProfileMainMenuButton) {
+                otherProfileFrame.setVisible(false);
                 mainMenuPopulate();
                 mainMenuFrame.setVisible(true);
             }
@@ -115,7 +125,7 @@ public class ClientGUI implements Runnable {
             }
 
             if (e.getSource() == userSearchButton) {
-                if (centralUserDatabase.searchUser(userSearchInput.getText()) != null && !userSearchInput.getText().equals(loggedInUser.getUsername())) {
+                if (centralUserDatabase.searchUser(userSearchInput.getText()) != null && !userSearchInput.getText().equals(loggedInUser.getUsername()) && !userSearchInput.equals("")) {
                     mainMenuFrame.setVisible(false);
                     User targetUser = centralUserDatabase.searchUser(userSearchInput.getText());
                     otherProfileName.setText("Profile:\n" + targetUser.getUsername());
@@ -128,7 +138,14 @@ public class ClientGUI implements Runnable {
             }
 
             if (e.getSource() == friend) {
-                loggedInUser.addFriend(userSearchInput.getText());
+                if (!loggedInUser.isFriend(userSearchInput.getText())) {
+                    loggedInUser.addFriend(userSearchInput.getText());
+                    centralUserDatabase.addUser(loggedInUser);
+                    centralUserDatabase.updateDatabaseFile();
+                }
+                otherProfileFrame.setVisible(false);
+                mainMenuPopulate();
+                mainMenuFrame.setVisible(true);
             }
 
         }
@@ -148,11 +165,21 @@ public class ClientGUI implements Runnable {
         } else {
             friendList.setText("Friends:\n" + String.join("\n", loggedInUser.getFriends()));
         }
-        /*for (PostClass post : userNewsFeed.getAllPosts()) {
-            if (loggedInUser.getFriends().contains((post.getOriginalPoster()))) {
-                newsFeed.append(post + "\n");
+        if (userNewsFeed.getAllPosts() == null || userNewsFeed.getAllPosts().isEmpty()) {
+            newsFeed.setText("No friend posts found!");
+        } else {
+            ArrayList<User> friends = new ArrayList<User>();
+            for (User potentialFriend : centralUserDatabase.getUsers()) {
+                if (loggedInUser.getFriends().contains(potentialFriend.getUsername())) {
+                    friends.add(potentialFriend);
+                }
             }
-        }*/
+            for (PostClass post : userNewsFeed.getAllPosts()) {
+                if (friends.contains(post.getOriginalPoster())) {
+                    newsFeed.append(post.getPostTitle() + "\n By: " + post.getOriginalPoster() + "\n" + post.getPostDescription() + "\n\n");
+                }
+            }
+        }
     }
 
     private void ProfilePopulate() {
@@ -291,12 +318,15 @@ public class ClientGUI implements Runnable {
         mainMenuUserSearchPanel.add(profileButton);
 
         newsFeed = new JTextArea();
+        createPostButton = new JButton("Create Post");
+        createPostButton.addActionListener(actionListener);
         newsFeed.setEditable(false);
         newsFeed.setFont(new Font("Serif", Font.BOLD, 25));
         newsFeed.setText("This is where the feed will go \n Example: \n \n Post 1 - by username \n \n Post text goes here \n \n Post 2 - by username2 \n \n Other post text goes here");
 
         JPanel middleMainMenuPanel = new JPanel();
         middleMainMenuPanel.setLayout(new BorderLayout());
+        middleMainMenuPanel.add(createPostButton, BorderLayout.BEFORE_FIRST_LINE);
         middleMainMenuPanel.add(newsFeed);
         mainMenuFrame.add(middleMainMenuPanel, BorderLayout.CENTER);
 
@@ -312,15 +342,15 @@ public class ClientGUI implements Runnable {
         profileName.setEditable(false);
         profileName.setFont(new Font("Serif", Font.BOLD, 20));
 
-        mainMenuButton = new JButton("Main Menu");
-        mainMenuButton.addActionListener(actionListener);
+        ownProfileMainMenuButton = new JButton("Main Menu");
+        ownProfileMainMenuButton.addActionListener(actionListener);
         editBioButton = new JButton("Edit");
         editBioButton.addActionListener(actionListener);
 
         JPanel profileNamePanel = new JPanel();
         profileNamePanel.setLayout(new BorderLayout());
         profileNamePanel.add(profileName);
-        profileNamePanel.add(mainMenuButton, BorderLayout.EAST);
+        profileNamePanel.add(ownProfileMainMenuButton, BorderLayout.EAST);
         profileFrame.add(profileNamePanel, BorderLayout.NORTH);
 
         profileBio = new JTextArea();
@@ -337,7 +367,7 @@ public class ClientGUI implements Runnable {
 
         otherProfileFrame = new JFrame("Profile");
         Container otherProfileContent = otherProfileFrame.getContentPane();
-        profileContent.setLayout(new BorderLayout());
+        otherProfileContent.setLayout(new BorderLayout());
 
         otherProfileFrame.setVisible(false);
         otherProfileFrame.setBackground(Color.white);
@@ -347,8 +377,8 @@ public class ClientGUI implements Runnable {
         otherProfileName.setEditable(false);
         otherProfileName.setFont(new Font("Serif", Font.BOLD, 20));
 
-        mainMenuButton = new JButton("Main Menu");
-        mainMenuButton.addActionListener(actionListener);
+        otherProfileMainMenuButton = new JButton("Main Menu");
+        otherProfileMainMenuButton.addActionListener(actionListener);
         block = new JButton("Block");
         block.addActionListener(actionListener);
         friend = new JButton("Friend");
@@ -357,7 +387,7 @@ public class ClientGUI implements Runnable {
         JPanel otherProfileNamePanel = new JPanel();
         otherProfileNamePanel.setLayout(new BorderLayout());
         otherProfileNamePanel.add(otherProfileName);
-        otherProfileNamePanel.add(mainMenuButton, BorderLayout.EAST);
+        otherProfileNamePanel.add(otherProfileMainMenuButton, BorderLayout.EAST);
         otherProfileNamePanel.add(friend, BorderLayout.PAGE_END);
         otherProfileFrame.add(block, BorderLayout.SOUTH);
         otherProfileFrame.add(otherProfileNamePanel, BorderLayout.NORTH);

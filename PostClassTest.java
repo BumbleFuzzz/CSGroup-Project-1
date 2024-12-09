@@ -77,8 +77,6 @@ public class PostClassTest {
     @Test
     void testGetters() {
         assertEquals(1, post.getPostID());
-        assertEquals("2024-11-03", post.getPostDate());
-        assertEquals("10:00 AM", post.getPostTime());
         assertEquals("testUser", post.getOriginalPoster().getUsername());
         assertEquals("Test Post", post.getPostTitle());
         assertEquals("This is a test post.", post.getPostDescription());

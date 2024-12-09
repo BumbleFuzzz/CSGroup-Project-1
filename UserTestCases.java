@@ -36,8 +36,8 @@ public class UserTestCases {
     public void testAddFriend() {
         newTestUser.addFriend(newFriendableUser.getUsername());
         System.out.println(newTestUser);
-        assertTrue(newTestUser.isFriend(newFriendableUser));
-        assertTrue(newFriendableUser.isFriend(newTestUser));
+        assertTrue(newTestUser.isFriend(newFriendableUser.getUsername()));
+        assertTrue(newFriendableUser.isFriend(newTestUser.getUsername()));
     }
 
     @Test
@@ -47,7 +47,7 @@ public class UserTestCases {
         newTestUser.blockUser(newFriendableUser);
 
         System.out.println(newTestUser);
-        assertFalse(newTestUser.isFriend(newFriendableUser));
+        assertFalse(newTestUser.isFriend(newFriendableUser.getUsername()));
         assertTrue(newTestUser.isBlocked(newFriendableUser));
     }
 

@@ -13,8 +13,6 @@ import java.util.List;
 public class PostClass implements PostInterface{
 
     int postID;
-    String postDate;
-    String postTime;
     User originalPoster;
     String postTitle;
     String postDescription;
@@ -24,8 +22,6 @@ public class PostClass implements PostInterface{
     // Constructor
     public PostClass(int postID, String postDate, String postTime, User originalPoster, String postTitle, String postDescription, int upVotes, int downVotes) {
         this.postID = postID;
-        this.postDate = postDate;
-        this.postTime = postTime;
         this.originalPoster = originalPoster;
         this.postTitle = postTitle;
         this.postDescription = postDescription;
@@ -35,8 +31,6 @@ public class PostClass implements PostInterface{
 
     public PostClass() {
         this.postID = -1;
-        this.postDate = null;
-        this.postTime = null;
         this.originalPoster = null;
         this.postTitle = null;
         this.postDescription = null;
@@ -50,8 +44,6 @@ public class PostClass implements PostInterface{
         File file = new File(filename);
         try (FileWriter writer = new FileWriter(file)) {
             writer.write( postID + "\n");
-            writer.write(postDate + "\n");
-            writer.write(postTime + "\n");
             writer.write(originalPoster.getUsername() + "\n");
             writer.write(postTitle + "\n");
             writer.write(postDescription + "\n");
@@ -96,13 +88,6 @@ public class PostClass implements PostInterface{
         return postID;
     }
 
-    public String getPostDate() {
-        return postDate;
-    }
-
-    public String getPostTime() {
-        return postTime;
-    }
 
     public User getOriginalPoster() {
         return originalPoster;
