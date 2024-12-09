@@ -34,7 +34,7 @@ public class UserTestCases {
 
     @Test
     public void testAddFriend() {
-        newTestUser.addFriend(newFriendableUser);
+        newTestUser.addFriend(newFriendableUser.getUsername());
         System.out.println(newTestUser);
         assertTrue(newTestUser.isFriend(newFriendableUser));
         assertTrue(newFriendableUser.isFriend(newTestUser));

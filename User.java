@@ -12,7 +12,7 @@ public class User implements UserInterface {
     private String password;
     private String biography;
     private ArrayList<User> blockedUsers;
-    private ArrayList<User> friends;
+    private ArrayList<String> friends;
     private ArrayList<PostClass> hiddenPosts;
     private static int IDIncrementer = 1; // Used to assign unique userIDs
 
@@ -21,7 +21,7 @@ public class User implements UserInterface {
         this.password = password;
         this.biography = biography;
         blockedUsers = new ArrayList<User>();
-        friends = new ArrayList<User>();
+        friends = new ArrayList<String>();
         hiddenPosts = new ArrayList<PostClass>();
         IDIncrementer++; // Makes sure that the next user gets a different ID
     }
@@ -44,7 +44,7 @@ public class User implements UserInterface {
         return blockedUsers;
     }
 
-    public ArrayList<User> getFriends() {
+    public ArrayList<String> getFriends() {
         return friends;
     }
 
@@ -67,11 +67,8 @@ public class User implements UserInterface {
 
     // Misc Data Management Methods
 
-    public void addFriend(User friend) { // Adds the user passed as an argument to this User's friendlist, and vice versa
-        if (!friends.contains(friend) && !blockedUsers.contains(friend)) {
-            friends.add(friend);
-            friend.friends.add(this);
-        }
+    public void addFriend(String name) { // Adds the user passed as an argument to this User's friendlist, and vice versa
+        friends.add(name);
     }
 
     public void removeFriend(User friend) { // Removes both users from each others friend lists
@@ -119,8 +116,14 @@ public class User implements UserInterface {
         String toReturn = (username + "," + password + "," + biography);
         if (!friends.isEmpty()) {
             toReturn+= ",";
-            for (User friend : friends) {
-                toReturn += "&" + friend.username;
+            for (String friend : friends) {
+                toReturn += "&" + friend;
+            }
+        }
+        if (!blockedUsers.isEmpty()) {
+            toReturn+= ",";
+            for (User blocked : blockedUsers) {
+                toReturn += "*" + blocked.username;
             }
         }
 

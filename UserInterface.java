@@ -12,12 +12,12 @@ public interface UserInterface {
     public String getPassword();
     public String getBiography();
     public ArrayList<User> getBlockedUsers();
-    public ArrayList<User> getFriends();
+    public ArrayList<String> getFriends();
     public ArrayList<PostClass> getHiddenPosts();
     public void setName(String name);
     public void setPassword(String password);
     public void setBiography(String biography);
-    public void addFriend(User friend);
+    public void addFriend(String name);
     public void removeFriend(User friend);
     public void blockUser(User userToBlock);
     public void unblockUser(User userToUnblock);

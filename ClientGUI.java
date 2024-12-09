@@ -15,6 +15,7 @@ public class ClientGUI implements Runnable {
     JFrame signupFrame;
     JFrame mainMenuFrame;
     JFrame profileFrame;
+    JFrame otherProfileFrame;
     JButton loginButton;
     JButton signUpButton;
     JButton loginAttemptButton;
@@ -23,6 +24,8 @@ public class ClientGUI implements Runnable {
     JButton profileButton;
     JButton editBioButton;
     JButton  mainMenuButton;
+    JButton block;
+    JButton friend;
     JTextField usernameInput;
     JTextField passwordInput;
     JTextField usernameSignupInput;
@@ -32,6 +35,8 @@ public class ClientGUI implements Runnable {
     JTextArea newsFeed;
     JTextArea profileName;
     JTextArea profileBio;
+    JTextArea otherProfileName;
+    JTextArea otherProfileBio;
     User loggedInUser;
     NewsFeed userNewsFeed;
     UserDatabase centralUserDatabase = new UserDatabase();
@@ -64,7 +69,7 @@ public class ClientGUI implements Runnable {
                     System.exit(0);
                 }
                 loginFrame.setVisible(false);
-                //mainMenuPopulate();
+                mainMenuPopulate();
                 mainMenuFrame.setVisible(true);
             }
 
@@ -89,14 +94,13 @@ public class ClientGUI implements Runnable {
 
             if (e.getSource() == profileButton) {
                 mainMenuFrame.setVisible(false);
-                profileName.setText("Profile:\n" + loggedInUser.getUsername());
-                profileBio.setText("Biography:\n" + loggedInUser.getBiography());
+                ProfilePopulate();
                 profileFrame.setVisible(true);
             }
 
             if (e.getSource() == mainMenuButton) {
                 profileFrame.setVisible(false);
-                //mainMenuPopulate();
+                mainMenuPopulate();
                 mainMenuFrame.setVisible(true);
             }
 
@@ -104,10 +108,10 @@ public class ClientGUI implements Runnable {
                 profileFrame.setVisible(false);
                 loggedInUser.setBiography(JOptionPane.showInputDialog(null, "Enter New Biography", "Edit Biography",
                         JOptionPane.PLAIN_MESSAGE));
-                System.out.println(loggedInUser.getBiography());
                 centralUserDatabase.addUser(loggedInUser);
                 centralUserDatabase.updateDatabaseFile();
-
+                ProfilePopulate();
+                profileFrame.setVisible(true);
             }
 
         }
@@ -123,15 +127,20 @@ public class ClientGUI implements Runnable {
     */
     private void mainMenuPopulate() {
         if (loggedInUser.getFriends() == null || loggedInUser.getFriends().isEmpty()) {
-            friendList.setText("No friended users found!");
+            friendList.setText("Friends:\nNo friended users found!");
         } else {
-            friendList.setText(loggedInUser.getFriends().toString());
+            friendList.setText("Friends:\n" + String.join("\n", loggedInUser.getFriends()));
         }
-        for (PostClass post : userNewsFeed.getAllPosts()) {
+        /*for (PostClass post : userNewsFeed.getAllPosts()) {
             if (loggedInUser.getFriends().contains((post.getOriginalPoster()))) {
                 newsFeed.append(post + "\n");
             }
-        }
+        }*/
+    }
+
+    private void ProfilePopulate() {
+        profileName.setText("Profile:\n" + loggedInUser.getUsername());
+        profileBio.setText("Biography:\n" + loggedInUser.getBiography());
     }
 
 
@@ -306,6 +315,42 @@ public class ClientGUI implements Runnable {
         profileBioPanel.add(editBioButton, BorderLayout.SOUTH);
         profileBioPanel.add(profileBio);
         profileFrame.add(profileBioPanel);
+
+        //other user's profiles
+
+        otherProfileFrame = new JFrame("Profile");
+        Container otherProfileContent = otherProfileFrame.getContentPane();
+        profileContent.setLayout(new BorderLayout());
+
+        otherProfileFrame.setVisible(false);
+        otherProfileFrame.setBackground(Color.white);
+        otherProfileFrame.setSize(1000,750);
+
+        otherProfileName = new JTextArea();
+        otherProfileName.setEditable(false);
+        otherProfileName.setFont(new Font("Serif", Font.BOLD, 20));
+
+        mainMenuButton = new JButton("Main Menu");
+        mainMenuButton.addActionListener(actionListener);
+        block = new JButton("Block");
+        block.addActionListener(actionListener);
+        friend = new JButton("Friend");
+        friend.addActionListener(actionListener);
+
+        JPanel otherProfileNamePanel = new JPanel();
+        otherProfileNamePanel.setLayout(new BorderLayout());
+        otherProfileNamePanel.add(otherProfileName);
+        otherProfileNamePanel.add(mainMenuButton, BorderLayout.EAST);
+        otherProfileFrame.add(otherProfileNamePanel, BorderLayout.NORTH);
+
+        otherProfileBio = new JTextArea();
+        otherProfileBio.setEditable(false);
+        otherProfileBio.setFont(new Font("Serif", Font.PLAIN,15));
+
+        JPanel otherProfileBioPanel = new JPanel();
+        otherProfileBioPanel.setLayout(new BorderLayout());
+        otherProfileBioPanel.add(otherProfileBio);
+        otherProfileFrame.add(otherProfileBioPanel);
 
     }
 }

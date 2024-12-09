@@ -51,14 +51,26 @@ public class UserDatabase implements UserDatabaseInterface{
 
                         List<String> friends = new ArrayList<>();
 
-                        for (int i = 4; i < parts.length; i += 3) {
+                        for (int i = 3; i < parts.length; i ++) {
                             if (parts[i].startsWith("&")) {
                                 String friendName = parts[i].substring(1); // Remove the '&'
                                 friends.add(friendName);
                             }
                         }
 
+                        List<String> blocked = new ArrayList<>();
+
+                        for (int i = 3; i < parts.length; i ++) {
+                            if (parts[i].startsWith("*")) {
+                                String blockedName = parts[i].substring(1); // Remove the '&'
+                                blocked.add(blockedName);
+                            }
+                        }
+
                         resultSerachUser =  new User(username, password, biography);
+                        for (String friendName : friends) {
+                            resultSerachUser.addFriend(friendName);
+                        }
                         break;
                     }
                     line = br.readLine();
