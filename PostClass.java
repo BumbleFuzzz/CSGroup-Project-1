@@ -18,6 +18,7 @@ public class PostClass implements PostInterface{
     String postDescription;
     int upVotes;
     int downVotes;
+    String filename;
 
     // Constructor
     public PostClass(User originalPoster, String postTitle, String postDescription, int upVotes, int downVotes) {
@@ -40,7 +41,7 @@ public class PostClass implements PostInterface{
 
     // Method to create a file for the post
     public void createPostFile() {
-        String filename = "posts/post-" + postID + ".txt";
+        filename = "posts/post-" + postID + ".txt";
         File file = new File(filename);
         try (FileWriter writer = new FileWriter(file)) {
             writer.write( postID + "\n");

@@ -177,11 +177,6 @@ public class ClientGUI implements Runnable {
     main menu, or every time you need to refresh the main menu for the user
     */
     private void mainMenuPopulate() {
-        // Clear previous components
-        newsFeed.removeAll();
-        newsFeed.revalidate();
-        newsFeed.repaint();
-
         // Friends List
         if (loggedInUser.getFriends() == null || loggedInUser.getFriends().isEmpty()) {
             friendList.setText("Friends:\nNo friended users found!");
@@ -206,10 +201,6 @@ public class ClientGUI implements Runnable {
                 }
             }
         }
-
-        // Refresh the panel after adding components
-        newsFeed.revalidate();
-        newsFeed.repaint();
     }
 
     private void ProfilePopulate() {
