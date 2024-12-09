@@ -209,17 +209,18 @@ public class ClientGUI implements Runnable {
                     String postContents = "";
                     String line = br.readLine();
                     String secondLine = br.readLine();
-                    if (loggedInUser.getFriends().contains(secondLine)) {
-                        postContents += "Post by: " + post.getOriginalPoster() + "\n";
+                    if (loggedInUser.getFriends().contains(secondLine) && !post.getOriginalPoster().equals(loggedInUser)) {
+                        postContents += "Post by: " + post.getOriginalPoster().getUsername() + "\n";
                         line = br.readLine();
                         for (int i = 0; i < 2; i++) {
                             postContents += line + "\n";
                             line = br.readLine();
                         }
                         postContents += "Upvotes: " + line + "  ";
-                        postContents += "Downvotes: " + br.readLine();
+                        postContents += "Downvotes: " + br.readLine() + "\n\n";
+                        newsFeed.append(postContents);
                     }
-                    newsFeed.append(postContents);
+
                 } catch(IOException e){
                     e.printStackTrace();
                 }
@@ -239,7 +240,6 @@ public class ClientGUI implements Runnable {
                                 fileInfo += line + ",";
                                 line = br.readLine();
                             }
-                            System.out.println("This is the file info: " + fileInfo);
 
                             if (fileInfo.isEmpty() || fileInfo.equals(",")) {
                                 System.out.println("Empty file!");
