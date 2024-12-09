@@ -211,6 +211,7 @@ public class ClientGUI implements Runnable {
                     String secondLine = br.readLine();
                     if (loggedInUser.getFriends().contains(secondLine) && !post.getOriginalPoster().equals(loggedInUser)) {
                         postContents += "Post by: " + post.getOriginalPoster().getUsername() + "\n";
+                        postContents += "Post ID: " + line + "\n";
                         line = br.readLine();
                         for (int i = 0; i < 2; i++) {
                             postContents += line + "\n";
