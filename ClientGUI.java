@@ -5,6 +5,11 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.stream.Stream;
 
 /**
  * GUI for the Client of the Social Media Program
@@ -80,6 +85,7 @@ public class ClientGUI implements Runnable {
                     System.exit(0);
                 }
                 loginFrame.setVisible(false);
+                newsFeedPopulateOnStartup();
                 mainMenuPopulate();
                 mainMenuFrame.setVisible(true);
             }
@@ -191,7 +197,7 @@ public class ClientGUI implements Runnable {
         if (userNewsFeed.getAllPosts() == null || userNewsFeed.getAllPosts().isEmpty()) {
             newsFeed.setText("No friend posts found!");
         } else {
-            ArrayList<User> friends = new ArrayList<User>();
+            ArrayList<User> friends = new ArrayList<>();
             for (User potentialFriend : centralUserDatabase.getUsers()) {
                 if (loggedInUser.getFriends().contains(potentialFriend.getUsername())) {
                     friends.add(potentialFriend);
@@ -199,20 +205,59 @@ public class ClientGUI implements Runnable {
             }
 
             for (PostClass post : userNewsFeed.getAllPosts()) {
-                if (friends.contains(post.getOriginalPoster())) {
+                try (BufferedReader br = new BufferedReader(new FileReader(post.filename))) {
                     String postContents = "";
-                    try (BufferedReader br = new BufferedReader(new FileReader(post.filename))) {
-                        String line = br.readLine();
+                    String line = br.readLine();
+                    String secondLine = br.readLine();
+                    if (loggedInUser.getFriends().contains(secondLine)) {
                         while (line != null) {
-                            postContents += line + "\n";
+                            postContents += line + ",";
                             line = br.readLine();
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
                     }
                     newsFeed.append(postContents);
+                } catch(IOException e){
+                    e.printStackTrace();
                 }
             }
+        }
+    }
+
+    private void newsFeedPopulateOnStartup() {
+        String folderPath = "posts";
+
+        try (Stream<Path> paths = Files.walk(Path.of(folderPath))) {
+            paths.filter(Files::isRegularFile).forEach(filePath -> {
+                        try (BufferedReader br = new BufferedReader(new FileReader(filePath.toFile()))) {
+                            String fileInfo = "";
+                            String line = br.readLine();
+                            while (line != null) {
+                                fileInfo += line + ",";
+                                line = br.readLine();
+                            }
+                            System.out.println("This is the file info: " + fileInfo);
+
+                            if (fileInfo.isEmpty() || fileInfo.equals(",")) {
+                                System.out.println("Empty file!");
+                            } else {
+                                String[] fileInfoSplit = fileInfo.split(",");
+
+                                User foundUser = new User("blank", "blank", "blank");
+                                for (User user : centralUserDatabase.getUsers()) {
+                                    if (user.getUsername().equals(fileInfoSplit[1])) {
+                                        foundUser = user;
+                                    }
+                                }
+                                PostClass postToAdd = new PostClass(foundUser, fileInfoSplit[2], fileInfoSplit[3], 0 , 0);
+                                postToAdd.filename = String.valueOf(filePath);
+                                userNewsFeed.addPost(postToAdd);
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -356,7 +401,6 @@ public class ClientGUI implements Runnable {
         createPostButton.addActionListener(actionListener);
         newsFeed.setEditable(false);
         newsFeed.setFont(new Font("Serif", Font.BOLD, 25));
-        newsFeed.setText("This is where the feed will go \n Example: \n \n Post 1 - by username \n \n Post text goes here \n \n Post 2 - by username2 \n \n Other post text goes here");
 
         JPanel middleMainMenuPanel = new JPanel();
         middleMainMenuPanel.setLayout(new BorderLayout());
