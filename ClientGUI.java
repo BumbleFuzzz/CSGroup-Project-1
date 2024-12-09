@@ -17,6 +17,7 @@ public class ClientGUI implements Runnable {
     JFrame mainMenuFrame;
     JFrame profileFrame;
     JFrame otherProfileFrame;
+    JFrame postFrame;
     JButton loginButton;
     JButton signUpButton;
     JButton loginAttemptButton;
@@ -35,7 +36,7 @@ public class ClientGUI implements Runnable {
     JTextField passwordSignupInput;
     JTextField userSearchInput;
     JTextArea friendList;
-    JTextArea newsFeed;
+    JPanel newsFeed;
     JTextArea profileName;
     JTextArea profileBio;
     JTextArea otherProfileName;
@@ -160,26 +161,55 @@ public class ClientGUI implements Runnable {
     main menu, or every time you need to refresh the main menu for the user
     */
     private void mainMenuPopulate() {
+        // Clear previous components
+        newsFeed.removeAll();
+        newsFeed.revalidate();
+        newsFeed.repaint();
+
+        // Friends List
         if (loggedInUser.getFriends() == null || loggedInUser.getFriends().isEmpty()) {
             friendList.setText("Friends:\nNo friended users found!");
         } else {
             friendList.setText("Friends:\n" + String.join("\n", loggedInUser.getFriends()));
         }
+
+        // News Feed
         if (userNewsFeed.getAllPosts() == null || userNewsFeed.getAllPosts().isEmpty()) {
-            newsFeed.setText("No friend posts found!");
+            JLabel noPostsLabel = new JLabel("No friend posts found!");
+            newsFeed.add(noPostsLabel);
         } else {
-            ArrayList<User> friends = new ArrayList<User>();
+            ArrayList<User> friends = new ArrayList<>();
             for (User potentialFriend : centralUserDatabase.getUsers()) {
                 if (loggedInUser.getFriends().contains(potentialFriend.getUsername())) {
                     friends.add(potentialFriend);
                 }
             }
+
             for (PostClass post : userNewsFeed.getAllPosts()) {
                 if (friends.contains(post.getOriginalPoster())) {
-                    newsFeed.append(post.getPostTitle() + "\n By: " + post.getOriginalPoster() + "\n" + post.getPostDescription() + "\n\n");
+                    // Create a button for each post
+                    JButton postButton = new JButton(post.getPostTitle());
+                    postButton.setToolTipText("<html><b>By:</b> " + post.getOriginalPoster() +
+                            "<br><b>Description:</b> " + post.getPostDescription() + "</html>");
+
+                    // Add action listener for button click
+                    postButton.addActionListener(e -> {
+                        JOptionPane.showMessageDialog(newsFeed,
+                                "Title: " + post.getPostTitle() +
+                                        "\nBy: " + post.getOriginalPoster() +
+                                        "\n\n" + post.getPostDescription(),
+                                "Post Details", JOptionPane.INFORMATION_MESSAGE);
+                    });
+
+                    // Add the button to the panel
+                    newsFeed.add(postButton);
                 }
             }
         }
+
+        // Refresh the panel after adding components
+        newsFeed.revalidate();
+        newsFeed.repaint();
     }
 
     private void ProfilePopulate() {
@@ -317,12 +347,14 @@ public class ClientGUI implements Runnable {
         profileButton.addActionListener(actionListener);
         mainMenuUserSearchPanel.add(profileButton);
 
-        newsFeed = new JTextArea();
+        newsFeed = new JPanel();
+        newsFeed.setLayout(new BoxLayout(newsFeed, BoxLayout.Y_AXIS));
         createPostButton = new JButton("Create Post");
         createPostButton.addActionListener(actionListener);
-        newsFeed.setEditable(false);
         newsFeed.setFont(new Font("Serif", Font.BOLD, 25));
-        newsFeed.setText("This is where the feed will go \n Example: \n \n Post 1 - by username \n \n Post text goes here \n \n Post 2 - by username2 \n \n Other post text goes here");
+        JScrollPane newsFeedScrollPane = new JScrollPane(newsFeed);
+        newsFeedScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        newsFeedScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
         JPanel middleMainMenuPanel = new JPanel();
         middleMainMenuPanel.setLayout(new BorderLayout());
@@ -401,5 +433,13 @@ public class ClientGUI implements Runnable {
         otherProfileBioPanel.add(otherProfileBio);
         otherProfileFrame.add(otherProfileBioPanel);
 
+        //post GUI
+        postFrame = new JFrame("Post");
+        Container postContent = postFrame.getContentPane();
+        postContent.setLayout(new BorderLayout());
+
+        postFrame.setVisible(false);
+        postFrame.setBackground(Color.white);
+        postFrame.setSize(500,200);
     }
 }
