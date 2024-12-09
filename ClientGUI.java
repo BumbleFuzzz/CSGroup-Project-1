@@ -1,6 +1,9 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -197,7 +200,17 @@ public class ClientGUI implements Runnable {
 
             for (PostClass post : userNewsFeed.getAllPosts()) {
                 if (friends.contains(post.getOriginalPoster())) {
-                    newsFeed.append(post.getPostTitle() + "\n By: " + post.getOriginalPoster() + "\n" + post.getPostDescription() + "\n\n");
+                    String postContents = "";
+                    try (BufferedReader br = new BufferedReader(new FileReader(post.filename))) {
+                        String line = br.readLine();
+                        while (line != null) {
+                            postContents += line + "\n";
+                            line = br.readLine();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    newsFeed.append(postContents);
                 }
             }
         }
