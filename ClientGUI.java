@@ -18,6 +18,7 @@ public class ClientGUI implements Runnable {
     JFrame profileFrame;
     JFrame otherProfileFrame;
     JFrame createPostFrame;
+    JFrame postFrame;
     JButton loginButton;
     JButton signUpButton;
     JButton loginAttemptButton;
@@ -176,11 +177,19 @@ public class ClientGUI implements Runnable {
     main menu, or every time you need to refresh the main menu for the user
     */
     private void mainMenuPopulate() {
+        // Clear previous components
+        newsFeed.removeAll();
+        newsFeed.revalidate();
+        newsFeed.repaint();
+
+        // Friends List
         if (loggedInUser.getFriends() == null || loggedInUser.getFriends().isEmpty()) {
             friendList.setText("Friends:\nNo friended users found!");
         } else {
             friendList.setText("Friends:\n" + String.join("\n", loggedInUser.getFriends()));
         }
+
+        // News Feed
         if (userNewsFeed.getAllPosts() == null || userNewsFeed.getAllPosts().isEmpty()) {
             newsFeed.setText("No friend posts found!");
         } else {
@@ -190,12 +199,17 @@ public class ClientGUI implements Runnable {
                     friends.add(potentialFriend);
                 }
             }
+
             for (PostClass post : userNewsFeed.getAllPosts()) {
                 if (friends.contains(post.getOriginalPoster())) {
                     newsFeed.append(post.getPostTitle() + "\n By: " + post.getOriginalPoster() + "\n" + post.getPostDescription() + "\n\n");
                 }
             }
         }
+
+        // Refresh the panel after adding components
+        newsFeed.revalidate();
+        newsFeed.repaint();
     }
 
     private void ProfilePopulate() {
@@ -441,6 +455,77 @@ public class ClientGUI implements Runnable {
 
         createPostFrame.add(createPostCentralPanel, BorderLayout.CENTER);
 
+
+        // Post GUI
+        postFrame = new JFrame("Post");
+        Container postContent = postFrame.getContentPane();
+        postContent.setLayout(new BorderLayout());
+
+    // Post details panel
+        JPanel postDetailsPanel = new JPanel();
+        postDetailsPanel.setLayout(new BoxLayout(postDetailsPanel, BoxLayout.Y_AXIS));
+        postDetailsPanel.setBackground(Color.white);
+
+    // Post title
+        JLabel postTitleLabel = new JLabel();
+        postTitleLabel.setFont(new Font("Serif", Font.BOLD, 16));
+        postTitleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        postDetailsPanel.add(postTitleLabel);
+
+    // Original poster
+        JLabel postOriginalPosterLabel = new JLabel();
+        postOriginalPosterLabel.setFont(new Font("Serif", Font.ITALIC, 14));
+        postOriginalPosterLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        postDetailsPanel.add(postOriginalPosterLabel);
+
+    // Post contents/description
+        JTextArea postDescriptionArea = new JTextArea();
+        postDescriptionArea.setLineWrap(true);
+        postDescriptionArea.setWrapStyleWord(true);
+        postDescriptionArea.setEditable(false);
+        postDescriptionArea.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        postDescriptionArea.setBackground(Color.LIGHT_GRAY);
+        postDescriptionArea.setAlignmentX(Component.LEFT_ALIGNMENT);
+        postDetailsPanel.add(Box.createVerticalStrut(10)); // Add spacing
+        postDetailsPanel.add(postDescriptionArea);
+
+    // Buttons panel
+        JPanel buttonsPanel = new JPanel();
+        buttonsPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        buttonsPanel.setBackground(Color.white);
+
+    // Upvote button
+        JButton upvoteButton = new JButton("Upvote");
+        upvoteButton.addActionListener(e -> {
+            // Handle upvote logic
+            JOptionPane.showMessageDialog(postFrame, "Post upvoted!");
+        });
+
+    // Downvote button
+        JButton downvoteButton = new JButton("Downvote");
+        downvoteButton.addActionListener(e -> {
+            // Handle downvote logic
+            JOptionPane.showMessageDialog(postFrame, "Post downvoted!");
+        });
+
+    // Delete button
+        JButton deleteButton = new JButton("Delete");
+        deleteButton.setForeground(Color.RED);
+        deleteButton.addActionListener(actionListener);
+
+    // Add buttons to the panel
+        buttonsPanel.add(upvoteButton);
+        buttonsPanel.add(downvoteButton);
+        buttonsPanel.add(deleteButton);
+
+    // Add components to the main frame
+        postContent.add(postDetailsPanel, BorderLayout.CENTER);
+        postContent.add(buttonsPanel, BorderLayout.SOUTH);
+
+    // Finalize frame settings
+        postFrame.setVisible(false);
+        postFrame.setBackground(Color.white);
+        postFrame.setSize(500, 300);
 
     }
 }
