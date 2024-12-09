@@ -114,6 +114,23 @@ public class ClientGUI implements Runnable {
                 profileFrame.setVisible(true);
             }
 
+            if (e.getSource() == userSearchButton) {
+                if (centralUserDatabase.searchUser(userSearchInput.getText()) != null && !userSearchInput.getText().equals(loggedInUser.getUsername())) {
+                    mainMenuFrame.setVisible(false);
+                    User targetUser = centralUserDatabase.searchUser(userSearchInput.getText());
+                    otherProfileName.setText("Profile:\n" + targetUser.getUsername());
+                    otherProfileBio.setText("Biography:\n" + targetUser.getBiography());
+                    otherProfileFrame.setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(null, "User does not exist or you can not search yourself!", "Fail",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            }
+
+            if (e.getSource() == friend) {
+                loggedInUser.addFriend(userSearchInput.getText());
+            }
+
         }
     };
 
@@ -341,6 +358,8 @@ public class ClientGUI implements Runnable {
         otherProfileNamePanel.setLayout(new BorderLayout());
         otherProfileNamePanel.add(otherProfileName);
         otherProfileNamePanel.add(mainMenuButton, BorderLayout.EAST);
+        otherProfileNamePanel.add(friend, BorderLayout.PAGE_END);
+        otherProfileFrame.add(block, BorderLayout.SOUTH);
         otherProfileFrame.add(otherProfileNamePanel, BorderLayout.NORTH);
 
         otherProfileBio = new JTextArea();
@@ -348,7 +367,7 @@ public class ClientGUI implements Runnable {
         otherProfileBio.setFont(new Font("Serif", Font.PLAIN,15));
 
         JPanel otherProfileBioPanel = new JPanel();
-        otherProfileBioPanel.setLayout(new BorderLayout());
+        otherProfileBioPanel.setLayout(new BorderLayout(100,100));
         otherProfileBioPanel.add(otherProfileBio);
         otherProfileFrame.add(otherProfileBioPanel);
 
