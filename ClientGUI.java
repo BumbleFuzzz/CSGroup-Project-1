@@ -210,10 +210,14 @@ public class ClientGUI implements Runnable {
                     String line = br.readLine();
                     String secondLine = br.readLine();
                     if (loggedInUser.getFriends().contains(secondLine)) {
-                        while (line != null) {
-                            postContents += line + ",";
+                        postContents += "Post by: " + post.getOriginalPoster() + "\n";
+                        line = br.readLine();
+                        for (int i = 0; i < 2; i++) {
+                            postContents += line + "\n";
                             line = br.readLine();
                         }
+                        postContents += "Upvotes: " + line + "  ";
+                        postContents += "Downvotes: " + br.readLine();
                     }
                     newsFeed.append(postContents);
                 } catch(IOException e){
