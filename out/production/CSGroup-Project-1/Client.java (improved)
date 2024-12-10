@@ -1,0 +1,118 @@
+/** 
+Improvements:
+
+isConnected Method: Added a utility to verify if the client is successfully connected to the server.
+runClientConsole Method: Introduced a command-line interface to allow the user to interact with the server by issuing commands such as:
+ADD_USER: To add a new user.
+GET_USER: To retrieve user details.
+EXIT: To close the client.
+Improved Error Messages: Added descriptive error messages to help identify issues during network operations or command parsing.
+More Commands: Expanded functionality to include specific use cases for server communication.
+*/
+
+import java.io.*;
+import java.net.*;
+import java.util.Scanner;
+
+/**
+ * Handles all interactions on the Client side of the Server/Client System
+ *
+ * @author Yog Trivedi
+ * @version December 5, 2024
+ */
+public class Client implements ClientInterface {
+    private Socket socket;
+    private ObjectOutputStream outStream;
+    private ObjectInputStream inStream;
+
+    public Client(String serverAddress, int port) {
+        try {
+            socket = new Socket(serverAddress, port);
+            outStream = new ObjectOutputStream(socket.getOutputStream());
+            inStream = new ObjectInputStream(socket.getInputStream());
+        } catch (IOException e) {
+            System.err.println("Error connecting to server: " + e.getMessage());
+        }
+    }
+
+    public static void main(String[] args) {
+        Client client = new Client("localhost", 12345);
+
+        if (client.isConnected()) {
+            client.runClientConsole();
+            client.closeConnection();
+        } else {
+            System.err.println("Failed to connect to the server.");
+        }
+    }
+
+    public boolean isConnected() {
+        return socket != null && socket.isConnected();
+    }
+
+    public Object sendRequest(Object request) {
+        try {
+            outStream.writeObject(request);
+            return inStream.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Error during communication: " + e.getMessage());
+        }
+        return null;
+    }
+
+    public void closeConnection() {
+        try {
+            if (socket != null && !socket.isClosed()) {
+                socket.close();
+            }
+        } catch (IOException e) {
+            System.err.println("Error closing connection: " + e.getMessage());
+        }
+    }
+
+    public void runClientConsole() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Connected to the server.");
+        System.out.println("Available commands: ADD_USER, GET_USER, EXIT");
+
+        while (true) {
+            System.out.print("Enter command: ");
+            String command = scanner.nextLine();
+
+            if ("EXIT".equalsIgnoreCase(command)) {
+                System.out.println("Exiting client.");
+                break;
+            }
+
+            switch (command.toUpperCase()) {
+                case "ADD_USER":
+                    System.out.print("Enter username: ");
+                    String username = scanner.nextLine();
+                    System.out.print("Enter email: ");
+                    String email = scanner.nextLine();
+                    String addUserRequest = "ADD_USER:" + username + ":" + email;
+                    Object addUserResponse = sendRequest(addUserRequest);
+                    System.out.println("Server response: " + addUserResponse);
+                    break;
+
+                case "GET_USER":
+                    System.out.print("Enter username: ");
+                    username = scanner.nextLine();
+                    String getUserRequest = "GET_USER:" + username;
+                    Object getUserResponse = sendRequest(getUserRequest);
+                    if (getUserResponse instanceof User) {
+                        User user = (User) getUserResponse;
+                        System.out.println("User details: " + user.getUsername() + ", " + user.getEmail());
+                    } else {
+                        System.out.println("Server response: " + getUserResponse);
+                    }
+                    break;
+
+                default:
+                    System.out.println("Invalid command. Try again.");
+            }
+        }
+
+        scanner.close();
+    }
+}
