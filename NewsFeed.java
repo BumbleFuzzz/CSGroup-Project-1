@@ -26,18 +26,6 @@ public class NewsFeed implements NewsFeedInterface {
         hiddenPosts = new ArrayList<>();
     }
 
-    // Reads posts from a given file and displays them to the feed
-    public void readPostsFromFile(String fileName) {
-        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-            String post;
-            while ((post = br.readLine()) != null) {
-                allPosts.add(new PostClass());
-            }
-            displayFeed();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     // Shows all posts in the feed
     public void displayFeed() {
@@ -89,4 +77,6 @@ public class NewsFeed implements NewsFeedInterface {
     public void removePost(PostClass postToRemove) {
         allPosts.remove(postToRemove);
     }
+
+    public void clearFeed() {allPosts.clear();}
 }

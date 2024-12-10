@@ -25,7 +25,7 @@ public class PostClassTest {
     void setUp() {
         // Assuming User class has a constructor User(String username)
         User user = new User("testUser","hi","no boi");
-        post = new PostClass(user, "Test Post", "This is a test post.", 0, 0);
+        post = new PostClass(user.getUsername(), "Test Post", "This is a test post.", 0, 0);
     }
 
     @AfterEach
@@ -77,7 +77,7 @@ public class PostClassTest {
     @Test
     void testGetters() {
         assertEquals(1, post.getPostID());
-        assertEquals("testUser", post.getOriginalPoster().getUsername());
+        assertEquals("testUser", post.getOriginalPoster());
         assertEquals("Test Post", post.getPostTitle());
         assertEquals("This is a test post.", post.getPostDescription());
         assertEquals(0, post.getUpVotes());

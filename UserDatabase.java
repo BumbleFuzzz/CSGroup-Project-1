@@ -85,8 +85,46 @@ public class UserDatabase implements UserDatabaseInterface{
     }
 
     public ArrayList<User> getUsers() {
-        return listOfUsers;
+        ArrayList<User> listOfUsersInFile = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader("userDatabase.txt"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+                String username = parts[0];
+                String password = parts[1];
+                String biography = parts[2];
+
+                List<String> friends = new ArrayList<>();
+                List<String> blocked = new ArrayList<>();
+
+                for (int i = 3; i < parts.length; i++) {
+                    if (parts[i].startsWith("&")) {
+                        String friendName = parts[i].substring(1); // Remove the '&'
+                        friends.add(friendName);
+                    } else if (parts[i].startsWith("*")) {
+                        String blockedName = parts[i].substring(1); // Remove the '*'
+                        blocked.add(blockedName);
+                    }
+                }
+
+                User user = new User(username, password, biography);
+                for (String friendName : friends) {
+                    user.addFriend(friendName);
+                }
+                for (String blockedName : blocked) {
+                    user.blockUser(blockedName); // Assuming a blockUser method exists in the User class
+                }
+
+                listOfUsersInFile.add(user);
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading the userDatabase.txt file: " + e.getMessage());
+        }
+
+        return listOfUsersInFile;
     }
+
 
     public File getCurrentDBFile() {
         return currentDBFile;

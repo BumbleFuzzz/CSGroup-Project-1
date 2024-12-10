@@ -13,7 +13,7 @@ import java.util.List;
 public class PostClass implements PostInterface{
 
     int postID;
-    User originalPoster;
+    String originalPoster;
     String postTitle;
     String postDescription;
     int upVotes;
@@ -22,7 +22,7 @@ public class PostClass implements PostInterface{
     static int postIDIncrementor = 1;
 
     // Constructor
-    public PostClass(User originalPoster, String postTitle, String postDescription, int upVotes, int downVotes) {
+    public PostClass(String originalPoster, String postTitle, String postDescription, int upVotes, int downVotes) {
         postID = postIDIncrementor;
         postIDIncrementor++;
         this.originalPoster = originalPoster;
@@ -32,13 +32,13 @@ public class PostClass implements PostInterface{
         this.downVotes = downVotes;
     }
 
-    public PostClass() {
-        this.postID = -1;
-        this.originalPoster = null;
-        this.postTitle = null;
-        this.postDescription = null;
-        this.upVotes = 0;
-        this.downVotes = 0;
+    public PostClass(int postID, String originalPoster, String postTitle, String postDescription, int upVotes, int downVotes) {
+        this.postID = postID;
+        this.originalPoster = originalPoster;
+        this.postTitle = postTitle;
+        this.postDescription = postDescription;
+        this.upVotes = upVotes;
+        this.downVotes = downVotes;
     }
 
     // Method to create a file for the post
@@ -47,7 +47,7 @@ public class PostClass implements PostInterface{
         File file = new File(filename);
         try (FileWriter writer = new FileWriter(file)) {
             writer.write( postID + "\n");
-            writer.write(originalPoster.getUsername() + "\n");
+            writer.write(originalPoster + "\n");
             writer.write(postTitle + "\n");
             writer.write(postDescription + "\n");
             writer.write(upVotes + "\n");
@@ -92,7 +92,7 @@ public class PostClass implements PostInterface{
     }
 
 
-    public User getOriginalPoster() {
+    public String getOriginalPoster() {
         return originalPoster;
     }
 
