@@ -11,36 +11,29 @@ import java.util.*;
 
 public class Comments implements CommentsInterface {
 
-    private String commentDate;
-    private String commentTime;
-    private User commenter;
-    private String commentText;
-    private PostClass post;
+    private int postID;
     private int upvotes;
     private int downvotes;
+    private String commenter;
+    private String commentText;
+    private int commentID;
+    static int commentIDIncrementor = 1;
 
-    public Comments(String commentDate, String commentTime, User commenter, String commentText, PostClass post) {
-        this.commentDate = commentDate;
-        this.commentTime = commentTime;
+    public Comments(int postID, String commenter, String commentText) {
+        commentID = commentIDIncrementor;
+        commentIDIncrementor++;
         this.commenter = commenter;
         this.commentText = commentText;
-        this.post = post;
         this.upvotes = 0;
         this.downvotes = 0;
+        this.postID = postID;
     }
 
     @Override
     public void appendCommentToPostFile() {
-        String filename = "comments/" + post.getPostID() + ".txt";
+        String filename = "comments/" + postID + ".txt";
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename, true))) {
-            writer.write(commentDate + "\n");
-            writer.write(commentTime + "\n");
-            writer.write(commenter.getUsername() + "\n");
-            writer.write(commentText + "\n");
-            writer.write(upvotes + "\n");
-            writer.write(downvotes + "\n");
-            writer.write("-----\n");
-            System.out.println("Comment appended to file: " + filename);
+            writer.write(commentID+ "," + commenter + "," + commentText + "," + upvotes + "," + downvotes + "\n");
         } catch (IOException e) {
             System.err.println("Error appending comment to file: " + e.getMessage());
         }
@@ -59,18 +52,12 @@ public class Comments implements CommentsInterface {
     }
 
     @Override
-    public void deleteCommentFromPostFile(User commenter) {
-        String filename = "comments/" + post.getPostID() + ".txt";
+    public void deleteCommentFromPostFile(int id) {
+        String filename = "comments/" + postID + ".txt";
         try {
             Path path = Paths.get(filename);
             String content = new String(Files.readAllBytes(path));
-            String commentData = "Comment Date: " + commentDate + "\n" +
-                    "Comment Time: " + commentTime + "\n" +
-                    "Commenter: " + commenter.getUsername() + "\n" +
-                    "Comment Text: " + commentText + "\n" +
-                    "Upvotes: " + upvotes + "\n" +
-                    "Downvotes: " + downvotes + "\n" +
-                    "-----\n";
+            String commentData = (commentID + "," + commenter + "," + commentText + "," + upvotes + "," + downvotes);
 
             content = content.replace(commentData, "");
             Files.write(path, content.getBytes());
@@ -86,13 +73,13 @@ public class Comments implements CommentsInterface {
     }
 
     @Override
-    public User getCommenter() {
+    public String getCommenter() {
         return commenter;
     }
 
     @Override
-    public PostClass getPost() {
-        return post;
+    public int getPost() {
+        return postID;
     }
 
     @Override

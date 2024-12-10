@@ -20,16 +20,16 @@ public interface CommentsInterface {
     void downvote();
 
     // Deletes the comment from the associated post's file
-    void deleteCommentFromPostFile(User commenter) throws IOException;
+    void deleteCommentFromPostFile(int id) throws IOException;
 
     // Getter for the comment's text
     String getCommentText();
 
     // Getter for the comment's author
-    User getCommenter();
+    String getCommenter();
 
     // Getter for the comment's associated post
-    PostClass getPost();
+    int getPost();
 
     // Getter for the comment's upvote count
     int getUpvotes();

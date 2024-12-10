@@ -12,10 +12,10 @@ public class CommentTest {
         // Set up test data
         User poster = new User("poster", "password123", "Original poster biography");
         PostClass post = new PostClass(poster.getUsername(), "Test Post Title", "This is a test post description.", 0, 0);
-    
+
         // Create a commenter
         User commenter = new User("commenter", "password456", "Commenter biography");
-        Comments comment = new Comments("2024-11-02", "10:05", commenter, "This is a test comment.", post);
+        Comments comment = new Comments(1, commenter.getUsername(), "This is a test comment.");
 
         
         comment.appendCommentToPostFile();

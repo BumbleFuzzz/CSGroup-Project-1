@@ -4,6 +4,7 @@ import java.awt.event.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +27,8 @@ public class ClientGUI implements Runnable {
     JFrame profileFrame;
     JFrame otherProfileFrame;
     JFrame createPostFrame;
-    JFrame postFrame;
+    JFrame createCommentFrame;
+    JFrame commentFrame;
     JButton loginButton;
     JButton signUpButton;
     JButton loginAttemptButton;
@@ -40,9 +42,15 @@ public class ClientGUI implements Runnable {
     JButton friend;
     JButton createPostButton;
     JButton confirmPostCreationButton;
+    JButton confirmCommentCreationButton;
     JButton upvoteButton;
     JButton downvoteButton;
     JButton openCommentsButton;
+    JButton commentMainMenue;
+    JButton upvoteCommentButton;
+    JButton downvoteCommentButton;
+    JButton deleteCommentButton;
+    JButton addCommentButton;
     JTextField usernameInput;
     JTextField passwordInput;
     JTextField usernameSignupInput;
@@ -50,19 +58,24 @@ public class ClientGUI implements Runnable {
     JTextField userSearchInput;
     JTextField createPostTitle;
     JTextField createPostDescription;
+    JTextField createCommentDescription;
     JTextField upvoteDownvoteInput;
     JTextField openCommentsInput;
+    JTextField upvoteDownvoteCommentInput;
+    JTextField deleteCommentInput;
     JTextArea friendList;
     JTextArea newsFeed;
     JTextArea profileName;
     JTextArea profileBio;
     JTextArea otherProfileName;
     JTextArea otherProfileBio;
+    JTextArea commentsArea;
     User loggedInUser;
     NewsFeed userNewsFeed = new NewsFeed();
     UserDatabase centralUserDatabase = new UserDatabase();
     String friendButtonContents;
-
+    int currentPost;
+    String currentPoster;
     /* action listener for buttons */
     ActionListener actionListener = new ActionListener() {
         @Override
@@ -188,13 +201,37 @@ public class ClientGUI implements Runnable {
                 createPostFrame.setVisible(true);
             }
 
+            if (e.getSource() == addCommentButton) {
+                createCommentFrame.setVisible(true);
+            }
+
+            if (e.getSource() == confirmCommentCreationButton) {
+                Comments comment = new Comments(currentPost, loggedInUser.getUsername(), createCommentDescription.getText());
+                comment.appendCommentToPostFile();
+                commentsPopulate();
+                commentFrame.setVisible(false);
+                commentFrame.setVisible(true);
+            }
+
             if (e.getSource() == confirmPostCreationButton) {
                 PostClass newPost = new PostClass(loggedInUser.getUsername(), createPostTitle.getText(), createPostDescription.getText(), 0, 0);
                 newPost.createPostFile();
+                try {
+                    File newFile = new File("comments/" + newPost.getPostID() + ".txt");
+                    if (newFile.createNewFile()) {
+                        System.out.println("=/aeju");
+                    }
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
                 userNewsFeed.addPost(newPost);
                 JOptionPane.showMessageDialog(null, "Success!", "Success",
                         JOptionPane.INFORMATION_MESSAGE);
                 createPostFrame.setVisible(false);
+                mainMenuFrame.setVisible(false);
+                newsFeedPopulateOnStartup();
+                mainMenuPopulate();
+                mainMenuFrame.setVisible(true);
             }
 
             if (e.getSource() == block) {
@@ -209,6 +246,178 @@ public class ClientGUI implements Runnable {
                 newsFeedPopulateOnStartup();
                 mainMenuPopulate();
                 mainMenuFrame.setVisible(true);
+            }
+
+            if (e.getSource() == downvoteButton) {
+                String postFile = "posts/post-" + upvoteDownvoteInput.getText() + ".txt";
+                Path filePath = Paths.get(postFile);
+                ArrayList<String> lines = new ArrayList<>();
+
+                try {
+                    // Read all lines into a list
+                    lines = (ArrayList<String>) Files.readAllLines(filePath);
+
+                    // Check if the file has at least 6 lines
+                    if (lines.size() >= 6) {
+                        // Parse the 6th line to an integer, increment by 1, and update the line
+                        try {
+                            int sixthLineValue = Integer.parseInt(lines.get(5).trim()); // 6th line is at index 5
+                            lines.set(5, String.valueOf(sixthLineValue + 1));
+                        } catch (NumberFormatException s) {
+                            return;
+                        }
+                    } else {
+                        return;
+                    }
+
+                    // Write the updated lines back to the file
+                    Files.write(filePath, lines);
+                } catch (IOException s) {
+                    System.out.println("An error occurred while modifying the file: " + s.getMessage());
+                }
+                mainMenuFrame.setVisible(false);
+                newsFeedPopulateOnStartup();
+                mainMenuPopulate();
+                mainMenuFrame.setVisible(true);
+            }
+
+            if (e.getSource() == upvoteButton) {
+                String postFile = "posts/post-" + upvoteDownvoteInput.getText() + ".txt";
+                Path filePath = Paths.get(postFile);
+                ArrayList<String> lines = new ArrayList<>();
+
+                try {
+                    // Read all lines into a list
+                    lines = (ArrayList<String>) Files.readAllLines(filePath);
+
+                    // Check if the file has at least 6 lines
+                    if (lines.size() >= 5) {
+                        // Parse the 6th line to an integer, increment by 1, and update the line
+                        try {
+                            int fifthLineValue = Integer.parseInt(lines.get(4).trim()); // 6th line is at index 5
+                            lines.set(4, String.valueOf(fifthLineValue + 1));
+                        } catch (NumberFormatException s) {
+                            return;
+                        }
+                    } else {
+                        return;
+                    }
+
+                    // Write the updated lines back to the file
+                    Files.write(filePath, lines);
+                } catch (IOException s) {
+                    System.out.println("An error occurred while modifying the file: " + s.getMessage());
+                }
+                mainMenuFrame.setVisible(false);
+                newsFeedPopulateOnStartup();
+                mainMenuPopulate();
+                mainMenuFrame.setVisible(true);
+            }
+
+            if (e.getSource() == openCommentsButton) {
+                currentPost = Integer.parseInt(openCommentsInput.getText());
+                mainMenuFrame.setVisible(false);
+                commentsPopulate();
+                commentFrame.setVisible(true);
+            }
+
+            if (e.getSource() == commentMainMenue) {
+                commentFrame.setVisible(false);
+                newsFeedPopulateOnStartup();
+                mainMenuPopulate();
+                mainMenuFrame.setVisible(true);
+            }
+
+            if (e.getSource() == downvoteCommentButton) {
+                String postFile = "comments/" + currentPost + ".txt";
+                Path filePath = Paths.get(postFile);
+                ArrayList<String> lines = new ArrayList<>();
+
+                try {
+                    // Read all lines into a list
+                    lines = new ArrayList<>(Files.readAllLines(filePath));
+                    for (int i = 0; i < lines.size(); i++) {
+                        String line = lines.get(i);
+                        String[] parts = line.split(",");
+
+                        // Compare strings using .equals()
+                        if (parts[0].equals(upvoteDownvoteCommentInput.getText())) {
+                            // Update the relevant field
+                            parts[4] = Integer.toString(Integer.parseInt(parts[4]) + 1);
+
+                            // Rebuild the line and update the list
+                            lines.set(i, String.join(",", parts));
+                        }
+                    }
+
+                    // Write the updated lines back to the file
+                    Files.write(filePath, lines);
+                } catch (IOException s) {
+                    System.out.println("An error occurred while modifying the file: " + s.getMessage());
+                }
+
+                commentFrame.setVisible(false);
+                commentsPopulate();
+                commentFrame.setVisible(true);
+            }
+
+            if (e.getSource() == upvoteCommentButton) {
+                String postFile = "comments/" + currentPost + ".txt";
+                Path filePath = Paths.get(postFile);
+                ArrayList<String> lines = new ArrayList<>();
+
+                try {
+                    // Read all lines into a list
+                    lines = new ArrayList<>(Files.readAllLines(filePath));
+                    for (int i = 0; i < lines.size(); i++) {
+                        String line = lines.get(i);
+                        String[] parts = line.split(",");
+
+                        // Compare strings using .equals()
+                        if (parts[0].equals(upvoteDownvoteCommentInput.getText())) {
+                            // Update the relevant field
+                            parts[3] = Integer.toString(Integer.parseInt(parts[3]) + 1);
+
+                            // Rebuild the line and update the list
+                            lines.set(i, String.join(",", parts));
+                        }
+                    }
+
+                    // Write the updated lines back to the file
+                    Files.write(filePath, lines);
+                } catch (IOException s) {
+                    System.out.println("An error occurred while modifying the file: " + s.getMessage());
+                }
+
+                commentFrame.setVisible(false);
+                commentsPopulate();
+                commentFrame.setVisible(true);
+            }
+
+            if (e.getSource() == deleteCommentButton) {
+                String postFile = "comments/" + currentPost + ".txt";
+                Path filePath = Paths.get(postFile);
+                ArrayList<String> lines = new ArrayList<>();
+
+                try {
+                    // Read all lines into a list
+                    lines = new ArrayList<>(Files.readAllLines(filePath));
+                    for (int i = 0; i < lines.size(); i++) {
+                        String line = lines.get(i);
+                        String[] parts = line.split(",");
+
+                        // Compare strings using .equals()
+                        if (parts[1].equals(loggedInUser.getUsername())) {
+                            // Update the relevant field
+                            commentsArea.setText("");
+
+
+                        }
+                    }
+
+                } catch (IOException s) {
+                    System.out.println("An error occurred while modifying the file: " + s.getMessage());
+                }
             }
         }
     };
@@ -245,7 +454,7 @@ public class ClientGUI implements Runnable {
                     String postContents = "";
                     String line = br.readLine();
                     String secondLine = br.readLine();
-                    if (loggedInUser.getFriends().contains(secondLine) && !loggedInUser.getBlockedUsers().contains(secondLine)) {
+                    if ((loggedInUser.getFriends().contains(secondLine) && !loggedInUser.getBlockedUsers().contains(secondLine)) || loggedInUser.getUsername().contains(secondLine)) {
                         postContents += "Post ID: " + post.getPostID() + "\n";
                         postContents += "Post by: " + post.getOriginalPoster() + "\n";
                         line = br.readLine();
@@ -261,6 +470,35 @@ public class ClientGUI implements Runnable {
                     e.printStackTrace();
                 }
             }
+        }
+    }
+
+    private void commentsPopulate() {
+        commentsArea.setText("");
+        String commentFile = "comments/" + openCommentsInput.getText() + ".txt";
+        Path filePath = Paths.get(commentFile);
+        ArrayList<String> lines = new ArrayList<>();
+
+        try {
+            // Read all lines into a list
+            lines = (ArrayList<String>) Files.readAllLines(filePath);
+            for (String line : lines) {
+                String[] parts = line.split(",");
+                String commentID = parts[0];
+                String commenter = parts[1];
+                String comment = parts[2];
+                String upvotes = parts[3];
+                String downvotes = parts[4];
+                commentsArea.append("Comment ID: " + commentID + "\n");
+                commentsArea.append("Commenter: " + commenter + "\n");
+                commentsArea.append(comment + "\n");
+                commentsArea.append("Upvotes: " + upvotes + "\n");
+                commentsArea.append("Downvotes: " + downvotes + "\n +====+ \n");
+
+            }
+
+        } catch (IOException s) {
+            System.out.println("An error occurred while modifying the file: " + s.getMessage());
         }
     }
 
@@ -413,7 +651,7 @@ public class ClientGUI implements Runnable {
         mainMenuFrame.setBackground(Color.white);
         mainMenuFrame.setSize(1000,750);
 
-        upvoteDownvoteInput = new JTextField(10);
+        upvoteDownvoteInput = new JTextField();
         openCommentsInput = new JTextField(10);
         upvoteButton = new JButton("Upvote");
         upvoteButton.addActionListener(actionListener);
@@ -425,6 +663,49 @@ public class ClientGUI implements Runnable {
 
         JLabel upvoteDownvoteHint = new JLabel("Put a post ID here, then choose to upvote or downvote it.");
         JLabel openCommentsHint = new JLabel("Put a post ID here in order to open its comment section");
+
+        commentFrame = new JFrame("Comments");
+        Container commentContent = commentFrame.getContentPane();
+        commentContent.setLayout(new BorderLayout());
+
+        commentFrame.setVisible(false);
+        commentFrame.setBackground(Color.white);
+        commentFrame.setSize(1000,750);
+
+        JPanel commentLeftPannel = new JPanel();
+        commentLeftPannel.setLayout(new BoxLayout(commentLeftPannel, BoxLayout.Y_AXIS));
+        upvoteCommentButton = new JButton("Upvote");
+        downvoteCommentButton = new JButton("Downvote");
+        deleteCommentButton = new JButton("Delete");
+        addCommentButton = new JButton("Add Comment");
+        upvoteDownvoteCommentInput = new JTextField();
+        deleteCommentInput = new JTextField();
+        commentLeftPannel.add(upvoteCommentButton);
+        commentLeftPannel.add(downvoteCommentButton);
+        JLabel upvoteDownvoteCommentHint = new JLabel("Put a comment ID here, then choose to upvote or downvote it.");
+        commentLeftPannel.add(upvoteDownvoteCommentHint);
+        commentLeftPannel.add(upvoteDownvoteCommentInput);
+        JLabel deleteCommentHint = new JLabel("Put a comment ID here, then choose to delete it.");
+        commentLeftPannel.add(deleteCommentHint);
+        commentLeftPannel.add(deleteCommentInput);
+        commentLeftPannel.add(deleteCommentButton);
+        commentLeftPannel.add(addCommentButton);
+        commentFrame.add(commentLeftPannel, BorderLayout.EAST);
+
+        JPanel commentRightPannel = new JPanel();
+        commentsArea = new JTextArea();
+        commentsArea.setEditable(false);
+        commentsArea.setLineWrap(true);
+        commentRightPannel.add(commentsArea);
+        commentFrame.add(commentRightPannel, BorderLayout.CENTER);
+
+        commentMainMenue = new JButton("Main Menu");
+        commentMainMenue.addActionListener(actionListener);
+        upvoteCommentButton.addActionListener(actionListener);
+        downvoteCommentButton.addActionListener(actionListener);
+        deleteCommentButton.addActionListener(actionListener);
+        addCommentButton.addActionListener(actionListener);
+        commentLeftPannel.add(commentMainMenue);
 
         JPanel mainMenuLeftFriendList = new JPanel();
         mainMenuLeftFriendList.setLayout(new BoxLayout(mainMenuLeftFriendList, BoxLayout.Y_AXIS));
@@ -440,7 +721,6 @@ public class ClientGUI implements Runnable {
         mainMenuLeftFriendList.add(openCommentsHint);
         mainMenuLeftFriendList.add(openCommentsInput);
         mainMenuLeftFriendList.add(openCommentsButton);
-        upvoteDownvoteInput = new JTextField(10);
         mainMenuFrame.add(mainMenuLeftFriendList, BorderLayout.WEST);
 
         userSearchInput = new JTextField(10);
@@ -566,77 +846,25 @@ public class ClientGUI implements Runnable {
 
         createPostFrame.add(createPostCentralPanel, BorderLayout.CENTER);
 
+        createCommentFrame = new JFrame("Create Post");
+        createCommentFrame.setSize(750,300);
+        Container createCommentFrameContent = createCommentFrame.getContentPane();
+        createCommentFrameContent.setLayout(new BorderLayout());
+        createCommentFrame.setVisible(false);
 
-        // Post GUI
-        postFrame = new JFrame("Post");
-        Container postContent = postFrame.getContentPane();
-        postContent.setLayout(new BorderLayout());
+        createCommentDescription = new JTextField();
 
-    // Post details panel
-        JPanel postDetailsPanel = new JPanel();
-        postDetailsPanel.setLayout(new BoxLayout(postDetailsPanel, BoxLayout.Y_AXIS));
-        postDetailsPanel.setBackground(Color.white);
+        createCommentDescription.setText("Comment description goes here!");
+        createCommentDescription.setFont(new Font("Serif", Font.PLAIN,35));
 
-    // Post title
-        JLabel postTitleLabel = new JLabel();
-        postTitleLabel.setFont(new Font("Serif", Font.BOLD, 16));
-        postTitleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        postDetailsPanel.add(postTitleLabel);
+        confirmCommentCreationButton = new JButton("Create Comment");
+        confirmCommentCreationButton.addActionListener(actionListener);
 
-    // Original poster
-        JLabel postOriginalPosterLabel = new JLabel();
-        postOriginalPosterLabel.setFont(new Font("Serif", Font.ITALIC, 14));
-        postOriginalPosterLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        postDetailsPanel.add(postOriginalPosterLabel);
+        JPanel createCommentCentralPanel = new JPanel();
+        createCommentCentralPanel.add(createCommentDescription);
+        createCommentCentralPanel.add(confirmCommentCreationButton);
 
-    // Post contents/description
-        JTextArea postDescriptionArea = new JTextArea();
-        postDescriptionArea.setLineWrap(true);
-        postDescriptionArea.setWrapStyleWord(true);
-        postDescriptionArea.setEditable(false);
-        postDescriptionArea.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        postDescriptionArea.setBackground(Color.LIGHT_GRAY);
-        postDescriptionArea.setAlignmentX(Component.LEFT_ALIGNMENT);
-        postDetailsPanel.add(Box.createVerticalStrut(10)); // Add spacing
-        postDetailsPanel.add(postDescriptionArea);
-
-    // Buttons panel
-        JPanel buttonsPanel = new JPanel();
-        buttonsPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-        buttonsPanel.setBackground(Color.white);
-
-    // Upvote button
-        JButton upvoteButton = new JButton("Upvote");
-        upvoteButton.addActionListener(e -> {
-            // Handle upvote logic
-            JOptionPane.showMessageDialog(postFrame, "Post upvoted!");
-        });
-
-    // Downvote button
-        JButton downvoteButton = new JButton("Downvote");
-        downvoteButton.addActionListener(e -> {
-            // Handle downvote logic
-            JOptionPane.showMessageDialog(postFrame, "Post downvoted!");
-        });
-
-    // Delete button
-        JButton deleteButton = new JButton("Delete");
-        deleteButton.setForeground(Color.RED);
-        deleteButton.addActionListener(actionListener);
-
-    // Add buttons to the panel
-        buttonsPanel.add(upvoteButton);
-        buttonsPanel.add(downvoteButton);
-        buttonsPanel.add(deleteButton);
-
-    // Add components to the main frame
-        postContent.add(postDetailsPanel, BorderLayout.CENTER);
-        postContent.add(buttonsPanel, BorderLayout.SOUTH);
-
-    // Finalize frame settings
-        postFrame.setVisible(false);
-        postFrame.setBackground(Color.white);
-        postFrame.setSize(500, 300);
+        createCommentFrame.add(createCommentCentralPanel, BorderLayout.CENTER);
 
     }
 }
