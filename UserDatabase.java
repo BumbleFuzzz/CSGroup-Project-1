@@ -71,6 +71,9 @@ public class UserDatabase implements UserDatabaseInterface{
                         for (String friendName : friends) {
                             resultSerachUser.addFriend(friendName);
                         }
+                        for (String blockedName : blocked) {
+                            resultSerachUser.blockUser(blockedName);
+                        }
                         break;
                     }
                     line = br.readLine();

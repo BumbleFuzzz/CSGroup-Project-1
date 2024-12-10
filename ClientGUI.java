@@ -140,7 +140,7 @@ public class ClientGUI implements Runnable {
             }
 
             if (e.getSource() == userSearchButton) {
-                if (centralUserDatabase.searchUser(userSearchInput.getText()) != null && !userSearchInput.getText().equals(loggedInUser.getUsername()) && !userSearchInput.equals("")) {
+                if (centralUserDatabase.searchUser(userSearchInput.getText()) != null && !userSearchInput.getText().equals(loggedInUser.getUsername()) && !userSearchInput.getText().trim().equals("") && !loggedInUser.isBlocked(userSearchInput.getText())) {
                     mainMenuFrame.setVisible(false);
                     User targetUser = centralUserDatabase.searchUser(userSearchInput.getText());
                     otherProfileName.setText("Profile:\n" + targetUser.getUsername());
@@ -151,8 +151,14 @@ public class ClientGUI implements Runnable {
                         friend.setText("Friend");
                     }
                     otherProfileFrame.setVisible(true);
+                } else if (centralUserDatabase.searchUser(userSearchInput.getText()) == null || userSearchInput.getText().trim().equals("")) {
+                    JOptionPane.showMessageDialog(null, "User does not exist!", "Fail",
+                            JOptionPane.ERROR_MESSAGE);
+                } else if (userSearchInput.getText().equals(loggedInUser.getUsername())) {
+                    JOptionPane.showMessageDialog(null, "You can not search yourself!", "Fail",
+                            JOptionPane.ERROR_MESSAGE);
                 } else {
-                    JOptionPane.showMessageDialog(null, "User does not exist or you can not search yourself!", "Fail",
+                    JOptionPane.showMessageDialog(null, "You have this user blocked!", "Fail",
                             JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -184,6 +190,20 @@ public class ClientGUI implements Runnable {
                 JOptionPane.showMessageDialog(null, "Success!", "Success",
                         JOptionPane.INFORMATION_MESSAGE);
                 createPostFrame.setVisible(false);
+            }
+
+            if (e.getSource() == block) {
+                int response = JOptionPane.showConfirmDialog(null, "WARNING: This can not be undone. Are you sure you want to continue?", "Order Form", JOptionPane.YES_NO_OPTION);
+                if (response == JOptionPane.YES_OPTION) {
+                    loggedInUser.blockUser(userSearchInput.getText());
+                    loggedInUser.removeFriend(userSearchInput.getText());
+                    centralUserDatabase.addUser(loggedInUser);
+                    centralUserDatabase.updateDatabaseFile();
+                }
+                otherProfileFrame.setVisible(false);
+                newsFeedPopulateOnStartup();
+                mainMenuPopulate();
+                mainMenuFrame.setVisible(true);
             }
         }
     };

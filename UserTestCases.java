@@ -48,7 +48,7 @@ public class UserTestCases {
 
         System.out.println(newTestUser);
         assertFalse(newTestUser.isFriend(newFriendableUser.getUsername()));
-        assertTrue(newTestUser.isBlocked(newFriendableUser));
+        assertTrue(newTestUser.isBlocked(newFriendableUser.getUsername()));
     }
 
     @Test

@@ -83,7 +83,7 @@ public class User implements UserInterface {
         return (friends.contains(userToCheck));
     }
 
-    public boolean isBlocked(User userToCheck) {
+    public boolean isBlocked(String userToCheck) {
         return (blockedUsers.contains(userToCheck));
     }
 
