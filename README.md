@@ -5,6 +5,7 @@ This project is a console-based social media platform, developed in Java, which 
 ## Brightspace and Vocareum Submisson
 - Asher Earnhart submitted Phase 1 workspace to Vocareum
 - Austin Napier submitted Phase 2 workspace to Vocareum
+- Yog Trivedi submitted Phase 3 workspace to Vocareum
 
 ## Instructions on How to Compile and Run the Project
 
@@ -14,59 +15,20 @@ This project is a console-based social media platform, developed in Java, which 
 - JUnit5 to run the unit tests for the classes.
 
 ### Compilation and Execution Instructions:
+In Phase 1, we focused on building the backend of our social media platform, which included creating a thread-safe user database and implementing JUnit test cases for core components. During this phase, we did not have a main method to show interactions between the server, clients, and database.
 
-#### Phase 1
-In Phase 1, we focused on setting up user accounts, creating profiles, establishing relationships (friend/block), and implementing persistent storage. The functionality included:
+Next, in Phase 2, we implemented the server and console-based client to facilitate interaction. You can start the server by running the Server.java class. Once the server is running, execute the Client.java class to access the application. If you want to simulate multiple users interacting simultaneously, you can run multiple instances of Client.java. For remote testing, use IntelliJ’s "Code with Me" feature to share your workspace and allow others to connect and execute the client from their terminals.
 
-- Created a persistent user database using .dat files.
-- Developed interfaces for each class and corresponding JUnit test cases.
-- Ensured thread safety using ConcurrentHashMap to allow the server to handle multiple clients safely.
-
-For Phase 1, there is no dedicated main method to demonstrate the interaction between the server, clients, and the database.
-
-#### Phase 2
-In Phase 2, we implemented the interaction between clients and the server.
-
-##### 1. Run the Server
-Start compiling the Server.java class.
-```java
-
-javac Server.java
-```
-
-Run the server to start listening for incoming connections using:
-```java
-
-java Server
-```
-
-- The server will listen for incoming client connections on port 12345.
-- The server can handle multiple clients simultaneously, creating a ClientHandler thread for each one.
-
-##### 2. Run the Client
-Next, compile the Client.java class.
-```java
-
-javac Client.java
-```
-
-Run the client to connect to the server using:
-```java
-
-java Client
-```
-
-- Run multiple instances of the Client.java class to simulate multiple users interacting with the server.
-- To simulate the application working across multiple devices, use IntelliJ's "Code with Me" to share workspace and allow other participants to execute the Client program from different terminals.
+For Phase 3, we introduced a graphical user interface (GUI) for an improved user experience. To use the GUI, run the ClientGUI.java class after starting the server. The GUI includes features such as profile management, a newsfeed, and friend interactions. You can simulate multiple clients by running ClientGUI.java in separate terminals or IDE instances. All scripts can be found in the src directory.
 
 ### Application Flow and Usage Instructions
 The application starts with an initial menu that allows you to:
 
 #### 1. Sign In or Create a New Account:
 - When you first run the program, you will be prompted to either Sign In using an existing account or Create a New Account.
-- If there is no data in the database (i.e., during the first run), you will need to create a new user account by selecting option 2.
+- If the database is empty, you must create a new account. Each account requires a unique username and password.
 
-#### 2. Post Login Menu:
+#### 2. Main Menu:
 - Once logged in, you will be provided with the following options:
     - Modify your profile details, such as profile name or description.
     - Look for other users using their login username.
@@ -74,7 +36,7 @@ The application starts with an initial menu that allows you to:
 
 #### 3. Edit Profile:
 - In this menu, you can:
-    - View your current profile details (including the profile name, description, friends list, and blocked users).
+    - View and update your profile details, including your display name, biography, friends list, and blocked users.
     - Modify the Profile Name or Profile Description.
 
 #### 4. Search for Users:
@@ -84,247 +46,125 @@ The application starts with an initial menu that allows you to:
     - Block/Unblock User.
     - Go Back to the previous menu.
 
-#### 5. Post and News Feed Interaction:
-- Create Posts: Users can make posts, which will appear in their friends' feeds.
-- Interact with Posts: Users can upvote or downvote posts, comment on posts, or hide posts that they do not want to see.
-- View News Feed: Displays posts made by your friends.
+#### 5. Newsfeed
+- You can view posts from friends in chronological order.
+- You can interact with posts by upvoting, downvoting, commenting, or hiding them.
+
+#### 6. Post and Comment Interactions:
+- You can make posts, which will appear in their friends' feeds.
+- Displays posts made by their friends.
+- Be able to add, upvote, and delete comments on posts.
 
 # Class Descriptions
 This project is structured using multiple classes, each implementing an interface to ensure flexibility and modularity. Below are the descriptions of all the classes:
 
-## 1. Client (implements ClientInterface)
-The Client class represents the client-side of the application where the user interacts with the system. It will establishes a connection to the server by send requests and receive responses. It also helps close the connection gracefully.
+## User
+The User class represents an individual user in the application. It stores data like the username, password, biography, friends list, and blocked users. Users can log in, add friends, and block/unblock other users.
+- Key Fields: username, password, biography, friends, blockedUsers.
+- Key Methods:
+  - addFriend(String friend): Adds a friend to the user’s friend list.
+  - blockUser(String userToBlock): Blocks a user and removes them from the friend list.
+  - loginAttempt(String username, String password): Checks if the provided credentials match the user’s stored data.
+- Tests:
+Tested user creation, friend/block functionality, and login validation.
 
-### Key Fields:
-- Socket socket: Used to establish a connection between the client and server.
-- ObjectOutputStream outStream: Sends data to the server.
-- ObjectInputStream inStream: Receives data from the server.
+## UserDatabase
+The UserDatabase class manages persistent storage of user data. It ensures that all user information is saved and retrievable across sessions.
+- Key Fields: listOfUsers, currentDBFile.
+- Key Methods:
+    - addUser(User user): Adds a new user to the database.
+    - createDatabaseFile(): Saves all user data to a file.
+    - searchUser(String username): Finds a user in the database by their username.
+- Tests:
+Verified data persistence and proper functionality for user addition/removal.
 
-### Methods:
-- sendRequest(Object request): Sends a request to the server and waits for a response.
-- closeConnection(): Closes the connection between the client and server.
+## PostClass
+The PostClass manages posts created by users. Each post includes details like a title, description, and timestamps, along with voting capabilities.
+- Key Fields: postID, postTitle, postDescription, upVotes, downVotes.
+- Key Methods:
+    - upvote(), downvote(): Allow users to interact with posts.
+    - createPostFile(): Saves post data to a file.
+- Tests:
+Verified post creation, interaction, and file storage.
 
-Example Usage:
-```java
+## Comments
+The Comments class enables users to add, upvote, or delete comments on posts.
+- Key Fields: commentText, upvotes, downvotes.
+- Key Methods:
+    - appendCommentToPostFile(): Adds a comment to the post’s associated file.
+    - deleteCommentFromPostFile(User commenter): Deletes comments made by the specified user.
+- Tests:
+Tested comment addition, deletion, and voting.
 
-Client client = new Client("localhost", 12345);
-Object response = client.sendRequest("Sample request");
-System.out.println("Response: " + response);
-client.closeConnection();
-```
+## NewsFeed
+The NewsFeed class is responsible for displaying posts to users in a chronological order.
+- Key Fields: allPosts, friendPosts, hiddenPosts.
+- Key Methods:
+    - displayFeed(): Shows posts from friends while filtering out hidden content.
+    - addFriendPost(PostClass post): Adds a friend’s post to the feed.
+- Tests:
+Verified post aggregation and feed display.
 
-## 2. Server (implements ServerInterface)
-The Server class manages incoming client connections by handle multiple client connections concurrently, processes requests such as fetching or updating user data, and ensures synchronization of data. It also stores user data in a thread-safe manner using ConcurrentHashMap.
+## Server
+The Server class processes client requests and manages user data. It is multi-threaded to handle multiple clients concurrently.
+- Key Fields: userDatabase, serverSocket, activeUsers.
+- Key Methods:
+    - startServer(int port): Starts the server to listen for connections.
+    - handleRequest(Object request, ObjectOutputStream outStream): Processes client requests and sends responses.
+- Tests:
+Ensured thread safety and proper handling of client interactions.
 
-### Key Fields:
-- Implements Runnable to handle each client interaction separately.
-- ConcurrentHashMap<String, User> userDatabase: Stores user data.
-- boolean isRunning: Indicates if the server is running.
+## Client and ClientGUI
+The Client class provides the console-based interface, while ClientGUI offers a graphical interface for the application.
+- Key Fields: socket, inStream, outStream.
+- Key Methods:
+    - sendRequest(Object request): Sends a request to the server.
+    - closeConnection(): Closes the client’s connection to the server.
+- Tests:
+Verified smooth operations for both console and GUI interfaces.
 
-### Methods:
-- startServer(int port): Initializes the server to listen on the specified port.
-- stopServer(): Stops the server gracefully.
-- handleRequest(Object request, ObjectOutputStream outStream): Handles the incoming requests from clients and returns appropriate responses.
+# IO Testing
+We conducted extensive testing to ensure that the application behaves as expected during normal and edge-case scenarios. Here’s how we approached testing for various parts of the system:
 
-Example Usage:
-```java
+## 1. Login and Signup:
 
-public static void main(String[] args) {
-    Server server = new Server();
-    new Thread(server).start(); // Start the server on a separate thread
-}
-```
-## 3. ClientHandler (implements ClientHandlerInterface)
-The ClientHandler class is responsible for managing individual client sessions and routing their requests to the server. It also runs a dedicated thread for each client connected to the server.
+- We tested the login and signup processes thoroughly to ensure smooth user entry into the platform.
+- The application successfully blocks the creation of accounts with duplicate usernames, showing the appropriate error message.
+- Incorrect username or password inputs during login were handled gracefully, prompting the user to try again.
 
-### Key Methods:
-- run(): The main loop that listens for client requests, processes them, and manages the client's session.
+## 2. Profile Management:
 
-Example Usage:
-```java
+- We verified that profile updates (e.g., changing name or biography) are reflected immediately in the database and across client sessions.
+- Other users can see these updates instantly when searching for the profile again.
 
-Socket clientSocket = new Socket("localhost", 12345);
-Server server = new Server();
-ClientHandler clientHandler = new ClientHandler(clientSocket, server);
-new Thread(clientHandler).start();
-```
+## 3. Friend and Block Management:
 
-## 4. User (implements UserInterface)
-The User class represents a user in the application. It will stores user details such as login credentials, profile information and manage their interactions with other users.
+- Adding and removing friends worked seamlessly, with both users’ friend lists updating correctly.
+- Blocking a user automatically removes them from the friend list, ensuring no further interaction is possible until they are unblocked.
+- Unblocking worked as intended, allowing users to reestablish connections.
 
-### Key Fields:
-- String username: The user’s unique identifier.
-- ArrayList<User> friends: List of the user’s friends.
-- ArrayList<User> blockedUsers: List of users blocked by this user.
+## 4. Newsfeed:
 
-### Methods:
-- addFriend(User friend): Adds another user to the friend list.
-- blockUser(User userToBlock): Blocks another user and removes them from the friend list.
-- loginAttempt(String username, String password): Validates login credentials.
+- Posts created by a user appeared on their friends’ newsfeeds in real-time.
+- The feed displayed posts in chronological order, and hiding a post successfully removed it from view while retaining it on the backend.
 
-Example Usage:
-```java
+## 5. Post and Comment Interactions:
 
-User user1 = new User("user1", "password1", "User One Biography");
-User user2 = new User("user2", "password2", "User Two Biography");
+- Upvoting, downvoting, and commenting on posts worked without any issues.
+- Comments added to posts were saved correctly and visible to all users with access to the post.
+- Users were able to delete their own comments, with the changes reflected immediately across all connected clients.
 
-// Adding and blocking friends
-user1.addFriend(user2);
-user1.blockUser(user2);
-System.out.println("Blocked users: " + user1.getBlockedUsers());
-```
+## 6. Multi-Client Scenarios:
 
-## 5. UserDatabase (implements UserDatabaseInterface)
-The UserDatabase class manages all user data, supports adding users, and provides data persistence.
+- We tested the application by running multiple clients simultaneously. Actions like adding friends, creating posts, and commenting were synchronized across all clients without delays or errors.
+- Abruptly closing a client did not disrupt the server or other active clients. Upon restarting the client, all data was intact, thanks to the persistent database.
 
-### Methods:
-- addUser(User user): Adds a new user to the database.
-- createDatabaseFile(): Writes all user information to a file for persistence.
-- saveUsersToFile(): Persists user data by saving it to a file.
+## 7. Server Restarts:
 
-Example Usage:
-```java
+- The server was restarted multiple times during testing to ensure that all user, post, and comment data persisted correctly.
+- After a restart, clients reconnected to the server without losing any data or functionality.
 
-UserDatabase userDatabase = new UserDatabase();
-User newUser = new User("newUser", "password123", "User biography");
+## 8. Error Handling:
 
-// Adding user to the database
-userDatabase.addUser(newUser);
-userDatabase.createDatabaseFile();
-System.out.println("User saved in the database.");
-```
-
-## 6. PostClass (implements PostInterface)
-The PostClass represents individual posts and manages their interactions like upvotes and downvotes.
-
-### Key Fields:
-- Manages user-created content such as postID, postDate, postTime, postTitle, postDescription, upVotes, downVotes.
-
-### Methods:
-- createPostFile(): Creates a file to store post information.
-- deletePostFile(): Deletes the post's file.
-- upvote(), downvote(): Increment upvotes or downvotes and allow other users to interact with posts.
-
-Example Usage:
-```java
-
-User poster = new User("posterUser", "password", "Poster biography");
-PostClass post = new PostClass(1, "2024-12-01", "10:30", poster, "First Post", "This is a post description.", 0, 0);
-
-// Upvoting the post
-post.upvote();
-System.out.println("Post upvotes: " + post.getUpVotes());
-```
-
-## 7. Comments (implements CommentsInterface)
-The Comments class allows users to create and manage comments on posts.
-
-### Key Fields:
-- String commentText: The content of the comment.
-- int upvotes, int downvotes: Track the popularity of each comment.
-
-### Methods:
-- appendCommentToPostFile(): Adds a comment to the post.
-- deleteCommentFromPostFile(User commenter): Allows the user to delete their own comment.
-
-Example Usage:
-```java
-
-User commenter = new User("commenterUser", "password", "Commenter biography");
-PostClass post = new PostClass(1, "2024-12-01", "11:00", commenter, "Sample Post", "Post description.", 0, 0);
-Comments comment = new Comments("2024-12-01", "11:15", commenter, "This is a comment.", post);
-
-comment.appendCommentToPostFile();
-comment.upvote();
-System.out.println("Comment upvotes: " + comment.getUpvotes());
-```
-
-## 8. NewsFeed (implements NewsFeedInterface)
-The NewsFeed class manages a user's feed and displays posts from their friends.
-
-### Methods:
-- readPostsFromFile(String fileName): Reads posts from a file.
-- displayFeed(): Displays all posts except hidden ones.
-- hidePost(String post), disclosePost(String post): Manage hidden posts.
-
-Example Usage:
-```java
-
-NewsFeed newsFeed = new NewsFeed();
-newsFeed.addFriendPost("Friend's post about Java");
-newsFeed.displayFeed();
-```
-# Testing
-
-## Overview
-Comprehensive testing was carried out to validate all features except direct IO-related features like multithreaded server-client interaction. Testing is split into unit tests for individual components and manual testing for IO features.
-
-### Unit Testing (JUnit)
-
-#### 1. UserTestCases:
-- Validates that users are created correctly.
-- Verifies that adding/removing friends and blocking users work properly.
-- Tests user login credentials.
-```java
-
-@Test
-public void testAddFriend() {
-    newTestUser.addFriend(newFriendableUser);
-    assertTrue(newTestUser.isFriend(newFriendableUser));
-}
-```
-
-#### 2. PostClassTest:
-- Ensures that posts are created and stored properly.
-- Verifies that posts can be interacted with using Upvote/Downvote.
-
-```java
-@Test
-void testUpvote() throws IOException {
-    post.upvote();
-    assertEquals(1, post.getUpVotes(), "Upvotes should be incremented by 1.");
-}
-```
-
-#### 3. NewsFeedTest:
-- Ensures that posts are loaded and displayed as intended.
-- Verifies the ability to hide or disclose posts.
-
-```java
-
-@Test
-void testHidePost() {
-    newsFeed.hidePost("Blocked Post");
-    assertTrue(newsFeed.getHiddenPosts().contains("Blocked Post"));
-}
-```
-
-#### 4. CommentTest:
-- Checks that comments are added to posts.
-- Ensures comments can be deleted.
-
-```java
-
-@Test
-public void testAppendAndUpvoteComment() {
-    User commenter = new User("commenter", "password", "Biography");
-    PostClass post = new PostClass(1, "2024-11-02", "10:00", commenter, "Test Post", "Test description.", 0, 0);
-
-    Comments comment = new Comments("2024-11-02", "10:05", commenter, "Test comment.", post);
-    comment.appendCommentToPostFile();
-    comment.upvote();
-    assertEquals(1, comment.getUpvotes());
-}
-```
-
-### Manual Testing (Server and Client IO)
-Due to the complexity of Network I/O, manual testing was conducted for:
-
-- Multiple clients were connected simultaneously to validate thread safety and proper data handling.
-- Verified that adding friends, blocking users, and creating posts by one user were properly reflected across other clients.
-- Tested abrupt disconnection of clients to ensure the server’s stability.
-
-### Running Tests
-- Ensure that JUnit5 is configured in your IDE.
-- Use your IDE to open each test file (UserTestCases.java, PostClassTest.java, NewsFeedTest.java, CommentTest.java) and run them with the test runner.
-
+- Attempts to perform invalid actions, such as friending a blocked user or posting without logging in, were met with appropriate error messages.
+- Unexpected inputs, such as empty fields or special characters, were handled gracefully, ensuring the application remained stable.
