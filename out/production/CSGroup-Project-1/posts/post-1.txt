@@ -1,6 +1,6 @@
 1
-testfriend
-Post title goes here! this is post1
+test2
+Post title goes here!
 Post description goes here!
 0
 0
