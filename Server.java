@@ -1,40 +1,60 @@
 import java.io.*;
 import java.net.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Handles the Server side of the Server/Client System
+ * Handles all interactions on the Server side of the Server/Client System
  *
- * @author Asher Earnhart
+ * @author Yog Trivedi
  * @version November 17, 2024
  */
+public class Server implements ServerInterface {
+    private ServerSocket serverSocket;
+    private Map<String, User> userDatabase; // Simulating a database with a map
 
-public class Server implements ServerInterface, Runnable {
-    private ConcurrentHashMap<String, User> userDatabase;  // Thread-safe storage
-    private List<User> activeUsers;
-    private boolean isRunning = true;
-
-    public Server() {
-        userDatabase = new ConcurrentHashMap<>();
-        activeUsers = new CopyOnWriteArrayList<>();
+    public Server(int port) {
+        try {
+            serverSocket = new ServerSocket(port);
+            userDatabase = new HashMap<>();
+            loadUserDatabase(); // Load user data from file or initialize
+            System.out.println("Server is running on port " + port);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public static void main(String[] args) {
-        Server server = new Server();
-        new Thread(server).start(); // Starts the server on a separate thread
-    }
-
-    @Override
-    public void startServer(int port) {
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
-            System.out.println("Server started on port " + port);
-
-            while (isRunning) {
+    public void start() {
+        while (true) {
+            try {
                 Socket clientSocket = serverSocket.accept();
-                new Thread(new ClientHandler(clientSocket, this)).start();
-                System.out.println("Client connected");
+                new Thread(new ClientHandler(clientSocket)).start();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void loadUserDatabase() {
+        // Load users from a file or initialize with default users
+        File userFile = new File("userDatabase.txt");
+        if (userFile.exists()) {
+            try (BufferedReader br = new BufferedReader(new FileReader(userFile))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    String[] parts = line.split(",");
+                    userDatabase.put(parts[0], new User(parts[0], parts[1], parts[2])); // username, password, bio
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public synchronized void saveUserDatabase() {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("userDatabase.txt"))) {
+            for (User user : userDatabase.values()) {
+                bw.write(user.getUsername() + "," + user.getPassword() + "," + user.getBiography() + "\n");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -42,37 +62,89 @@ public class Server implements ServerInterface, Runnable {
     }
 
     @Override
-    public void stopServer() {
-        isRunning = false;
+    public Object processRequest(Object request) {
+        return null;
     }
 
-    @Override
-    public void handleRequest(Object request, ObjectOutputStream outStream) {
-        // Handle client request (e.g., fetching or updating user data)
-    }
+    private class ClientHandler implements Runnable {
+        private Socket clientSocket;
+        private ObjectOutputStream outStream;
+        private ObjectInputStream inStream;
 
-    @Override
-    public void addUser(String username, String password, String bio) { // Handles the addition of a new user to the database
-        User user = new User(username, password, bio);
-        userDatabase.put(user.getUsername(), user);
-    }
+        public ClientHandler(Socket clientSocket) {
+            this.clientSocket = clientSocket;
+        }
 
-    @Override
-    public void removeUser(User user) { // Handles removal of a user from the database
-        if (userDatabase.containsKey(user.getUsername()) && userDatabase.contains(user)) {
-            userDatabase.remove(user);
+        @Override
+        public void run() {
+            try {
+                outStream = new ObjectOutputStream(clientSocket.getOutputStream());
+                inStream = new ObjectInputStream(clientSocket.getInputStream());
+
+                Object request;
+                while ((request = inStream.readObject()) != null) {
+                    Object response = processRequest(request);
+                    outStream.writeObject(response);
+                }
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    clientSocket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        private Object processRequest(Object request) {
+            if (request instanceof String) {
+                String[] parts = ((String) request).split(",");
+                String command = parts[0];
+                switch (command) {
+                    case "LOGIN":
+                        return handleLogin(parts[1], parts[2]); // username, password
+                    case "SIGNUP":
+                        return handleSignup(parts[1], parts[2], parts[3]); // username, password, bio
+                    case "UPDATE_BIO":
+                        return handleUpdateBio(parts[1], parts[2]); // username, bio
+                    default:
+                        return "Unknown command";
+                }
+            }
+            return "Invalid request";
+        }
+
+        private String handleLogin(String username, String password) {
+            User user = userDatabase.get(username);
+            if (user != null && user.getPassword().equals(password)) {
+                return "LOGIN_SUCCESS," + user.getBiography();
+            }
+            return "LOGIN_FAIL";
+        }
+
+        private String handleSignup(String username, String password, String bio) {
+            if (userDatabase.containsKey(username)) {
+                return "SIGNUP_FAIL";
+            }
+            userDatabase.put(username, new User(username, password, bio));
+            saveUserDatabase();
+            return "SIGNUP_SUCCESS";
+        }
+
+        private String handleUpdateBio(String username, String bio) {
+            User user = userDatabase.get(username);
+            if (user != null) {
+                user.setBiography(bio);
+                saveUserDatabase();
+                return "UPDATE_BIO_SUCCESS";
+            }
+            return "UPDATE_BIO_FAIL";
         }
     }
 
-    @Override
-    public User getUser(String username) {
-        return userDatabase.get(username);
+    public static void main(String[] args) {
+        Server server = new Server(12345); // Port 12345
+        server.start();
     }
-
-    @Override
-    public void run() {
-        startServer(12345);
-    }
-
-    // Additional methods to manipulate the userDatabase
 }

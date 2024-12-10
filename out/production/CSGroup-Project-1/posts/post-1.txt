@@ -2,5 +2,5 @@
 test2
 Post title goes here!
 Post description goes here!
-0
-0
+1
+1
