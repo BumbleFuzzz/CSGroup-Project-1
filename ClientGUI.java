@@ -40,6 +40,9 @@ public class ClientGUI implements Runnable {
     JButton friend;
     JButton createPostButton;
     JButton confirmPostCreationButton;
+    JButton upvoteButton;
+    JButton downvoteButton;
+    JButton openCommentsButton;
     JTextField usernameInput;
     JTextField passwordInput;
     JTextField usernameSignupInput;
@@ -47,6 +50,8 @@ public class ClientGUI implements Runnable {
     JTextField userSearchInput;
     JTextField createPostTitle;
     JTextField createPostDescription;
+    JTextField upvoteDownvoteInput;
+    JTextField openCommentsInput;
     JTextArea friendList;
     JTextArea newsFeed;
     JTextArea profileName;
@@ -278,7 +283,7 @@ public class ClientGUI implements Runnable {
                             } else {
                                 String[] fileInfoSplit = fileInfo.split(",");
 
-                                User foundUser = null;
+                                User foundUser = new User("blank", "blank", "blank");
                                 for (User user : centralUserDatabase.getUsers()) {
                                     if (user.getUsername().equals(fileInfoSplit[1])) {
                                         foundUser = user;
@@ -408,12 +413,34 @@ public class ClientGUI implements Runnable {
         mainMenuFrame.setBackground(Color.white);
         mainMenuFrame.setSize(1000,750);
 
+        upvoteDownvoteInput = new JTextField(10);
+        openCommentsInput = new JTextField(10);
+        upvoteButton = new JButton("Upvote");
+        upvoteButton.addActionListener(actionListener);
+        downvoteButton = new JButton("Downvote");
+        downvoteButton.addActionListener(actionListener);
+
+        openCommentsButton = new JButton("Open Comments");
+        openCommentsButton.addActionListener(actionListener);
+
+        JLabel upvoteDownvoteHint = new JLabel("Put a post ID here, then choose to upvote or downvote it.");
+        JLabel openCommentsHint = new JLabel("Put a post ID here in order to open its comment section");
+
         JPanel mainMenuLeftFriendList = new JPanel();
+        mainMenuLeftFriendList.setLayout(new BoxLayout(mainMenuLeftFriendList, BoxLayout.Y_AXIS));
         friendList = new JTextArea();
         friendList.setText("Friends List:");
         friendList.setEditable(false);
         friendList.setFont(new Font("Serif", Font.BOLD, 35));
         mainMenuLeftFriendList.add(friendList);
+        mainMenuLeftFriendList.add(upvoteDownvoteHint);
+        mainMenuLeftFriendList.add(upvoteDownvoteInput);
+        mainMenuLeftFriendList.add(upvoteButton);
+        mainMenuLeftFriendList.add(downvoteButton);
+        mainMenuLeftFriendList.add(openCommentsHint);
+        mainMenuLeftFriendList.add(openCommentsInput);
+        mainMenuLeftFriendList.add(openCommentsButton);
+        upvoteDownvoteInput = new JTextField(10);
         mainMenuFrame.add(mainMenuLeftFriendList, BorderLayout.WEST);
 
         userSearchInput = new JTextField(10);
