@@ -11,7 +11,7 @@ public class CommentTest {
     public static void main(String[] args) {
         // Set up test data
         User poster = new User("poster", "password123", "Original poster biography");
-        PostClass post = new PostClass(poster, "Test Post Title", "This is a test post description.", 0, 0);
+        PostClass post = new PostClass(poster.getUsername(), "Test Post Title", "This is a test post description.", 0, 0);
     
         // Create a commenter
         User commenter = new User("commenter", "password456", "Commenter biography");

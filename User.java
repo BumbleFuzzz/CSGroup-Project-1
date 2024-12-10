@@ -11,7 +11,7 @@ public class User implements UserInterface {
     private String username;
     private String password;
     private String biography;
-    private ArrayList<User> blockedUsers;
+    private ArrayList<String> blockedUsers;
     private ArrayList<String> friends;
     private ArrayList<PostClass> hiddenPosts;
     private static int IDIncrementer = 1; // Used to assign unique userIDs
@@ -20,7 +20,7 @@ public class User implements UserInterface {
         this.username = username;
         this.password = password;
         this.biography = biography;
-        blockedUsers = new ArrayList<User>();
+        blockedUsers = new ArrayList<String>();
         friends = new ArrayList<String>();
         hiddenPosts = new ArrayList<PostClass>();
         IDIncrementer++; // Makes sure that the next user gets a different ID
@@ -40,7 +40,7 @@ public class User implements UserInterface {
         return biography;
     }
 
-    public ArrayList<User> getBlockedUsers() {
+    public ArrayList<String> getBlockedUsers() {
         return blockedUsers;
     }
 
@@ -71,36 +71,19 @@ public class User implements UserInterface {
         friends.add(name);
     }
 
-    public void removeFriend(User friend) { // Removes both users from each others friend lists
-        if (friends.contains(friend)) {
-            friends.remove(friend);
-            friend.friends.remove(this);
-        }
+    public void removeFriend(String friend) { // Removes both users from each others friend lists
+        friends.remove(friend);
     }
 
-    public void blockUser(User userToBlock) { // Adds both users to each others block lists
-        if (!blockedUsers.contains(userToBlock)) {
-            if (friends.contains(userToBlock)) {
-                friends.remove(userToBlock);
-                userToBlock.friends.remove(this);
-            }
-            blockedUsers.add(userToBlock);
-            userToBlock.blockedUsers.add(this);
-        }
-    }
-
-    public void unblockUser(User userToUnblock) { // Removes both users from each others block lists
-        if (blockedUsers.contains(userToUnblock)) {
-            blockedUsers.remove(userToUnblock);
-            userToUnblock.blockedUsers.remove(this);
-        }
+    public void blockUser(String userToBlock) { // Adds both users to each others block lists
+        blockedUsers.add(userToBlock);
     }
 
     public boolean isFriend(String userToCheck) { // Checks to see if the two users are friended to each other
         return (friends.contains(userToCheck));
     }
 
-    public boolean isBlocked(User userToCheck) {
+    public boolean isBlocked(String userToCheck) {
         return (blockedUsers.contains(userToCheck));
     }
 
@@ -122,8 +105,8 @@ public class User implements UserInterface {
         }
         if (!blockedUsers.isEmpty()) {
             toReturn+= ",";
-            for (User blocked : blockedUsers) {
-                toReturn += "*" + blocked.username;
+            for (String blocked : blockedUsers) {
+                toReturn += "*" + blocked;
             }
         }
 

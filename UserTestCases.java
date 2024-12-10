@@ -44,11 +44,11 @@ public class UserTestCases {
     public void testBlock() {
         System.out.println("The first user will now block the second, also removing them from their friends list.");
 
-        newTestUser.blockUser(newFriendableUser);
+        newTestUser.blockUser(newFriendableUser.getUsername());
 
         System.out.println(newTestUser);
         assertFalse(newTestUser.isFriend(newFriendableUser.getUsername()));
-        assertTrue(newTestUser.isBlocked(newFriendableUser));
+        assertTrue(newTestUser.isBlocked(newFriendableUser.getUsername()));
     }
 
     @Test

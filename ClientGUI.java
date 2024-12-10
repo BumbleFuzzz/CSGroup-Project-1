@@ -27,7 +27,6 @@ public class ClientGUI implements Runnable {
     JFrame otherProfileFrame;
     JFrame createPostFrame;
     JFrame postFrame;
-    JFrame commentFrame;
     JButton loginButton;
     JButton signUpButton;
     JButton loginAttemptButton;
@@ -41,9 +40,6 @@ public class ClientGUI implements Runnable {
     JButton friend;
     JButton createPostButton;
     JButton confirmPostCreationButton;
-    JButton upvoteButton;
-    JButton downvoteButton;
-    JButton openCommentsButton;
     JTextField usernameInput;
     JTextField passwordInput;
     JTextField usernameSignupInput;
@@ -51,8 +47,6 @@ public class ClientGUI implements Runnable {
     JTextField userSearchInput;
     JTextField createPostTitle;
     JTextField createPostDescription;
-    JTextField upvoteDownvoteInputIDField;
-    JTextField openCommentsInputIDField;
     JTextArea friendList;
     JTextArea newsFeed;
     JTextArea profileName;
@@ -62,6 +56,7 @@ public class ClientGUI implements Runnable {
     User loggedInUser;
     NewsFeed userNewsFeed = new NewsFeed();
     UserDatabase centralUserDatabase = new UserDatabase();
+    String friendButtonContents;
 
     /* action listener for buttons */
     ActionListener actionListener = new ActionListener() {
@@ -145,14 +140,25 @@ public class ClientGUI implements Runnable {
             }
 
             if (e.getSource() == userSearchButton) {
-                if (centralUserDatabase.searchUser(userSearchInput.getText()) != null && !userSearchInput.getText().equals(loggedInUser.getUsername()) && !userSearchInput.equals("")) {
+                if (centralUserDatabase.searchUser(userSearchInput.getText()) != null && !userSearchInput.getText().equals(loggedInUser.getUsername()) && !userSearchInput.getText().trim().equals("") && !loggedInUser.isBlocked(userSearchInput.getText())) {
                     mainMenuFrame.setVisible(false);
                     User targetUser = centralUserDatabase.searchUser(userSearchInput.getText());
                     otherProfileName.setText("Profile:\n" + targetUser.getUsername());
                     otherProfileBio.setText("Biography:\n" + targetUser.getBiography());
+                    if (loggedInUser.isFriend(userSearchInput.getText())) {
+                        friend.setText("Unfriend");
+                    } else {
+                        friend.setText("Friend");
+                    }
                     otherProfileFrame.setVisible(true);
+                } else if (centralUserDatabase.searchUser(userSearchInput.getText()) == null || userSearchInput.getText().trim().equals("")) {
+                    JOptionPane.showMessageDialog(null, "User does not exist!", "Fail",
+                            JOptionPane.ERROR_MESSAGE);
+                } else if (userSearchInput.getText().equals(loggedInUser.getUsername())) {
+                    JOptionPane.showMessageDialog(null, "You can not search yourself!", "Fail",
+                            JOptionPane.ERROR_MESSAGE);
                 } else {
-                    JOptionPane.showMessageDialog(null, "User does not exist or you can not search yourself!", "Fail",
+                    JOptionPane.showMessageDialog(null, "You have this user blocked!", "Fail",
                             JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -162,8 +168,13 @@ public class ClientGUI implements Runnable {
                     loggedInUser.addFriend(userSearchInput.getText());
                     centralUserDatabase.addUser(loggedInUser);
                     centralUserDatabase.updateDatabaseFile();
+                } else {
+                    loggedInUser.removeFriend(userSearchInput.getText());
+                    centralUserDatabase.addUser(loggedInUser);
+                    centralUserDatabase.updateDatabaseFile();
                 }
                 otherProfileFrame.setVisible(false);
+                newsFeedPopulateOnStartup();
                 mainMenuPopulate();
                 mainMenuFrame.setVisible(true);
             }
@@ -173,12 +184,26 @@ public class ClientGUI implements Runnable {
             }
 
             if (e.getSource() == confirmPostCreationButton) {
-                PostClass newPost = new PostClass(loggedInUser, createPostTitle.getText(), createPostDescription.getText(), 0, 0);
+                PostClass newPost = new PostClass(loggedInUser.getUsername(), createPostTitle.getText(), createPostDescription.getText(), 0, 0);
                 newPost.createPostFile();
                 userNewsFeed.addPost(newPost);
                 JOptionPane.showMessageDialog(null, "Success!", "Success",
                         JOptionPane.INFORMATION_MESSAGE);
                 createPostFrame.setVisible(false);
+            }
+
+            if (e.getSource() == block) {
+                int response = JOptionPane.showConfirmDialog(null, "WARNING: This can not be undone. Are you sure you want to continue?", "Order Form", JOptionPane.YES_NO_OPTION);
+                if (response == JOptionPane.YES_OPTION) {
+                    loggedInUser.blockUser(userSearchInput.getText());
+                    loggedInUser.removeFriend(userSearchInput.getText());
+                    centralUserDatabase.addUser(loggedInUser);
+                    centralUserDatabase.updateDatabaseFile();
+                }
+                otherProfileFrame.setVisible(false);
+                newsFeedPopulateOnStartup();
+                mainMenuPopulate();
+                mainMenuFrame.setVisible(true);
             }
         }
     };
@@ -215,19 +240,18 @@ public class ClientGUI implements Runnable {
                     String postContents = "";
                     String line = br.readLine();
                     String secondLine = br.readLine();
-                    if (loggedInUser.getFriends().contains(secondLine) && !post.getOriginalPoster().equals(loggedInUser)) {
-                        postContents += "Post by: " + post.getOriginalPoster().getUsername() + "\n";
-                        postContents += "Post ID: " + line + "\n";
+                    if (loggedInUser.getFriends().contains(secondLine) && !loggedInUser.getBlockedUsers().contains(secondLine)) {
+                        postContents += "Post ID: " + post.getPostID() + "\n";
+                        postContents += "Post by: " + post.getOriginalPoster() + "\n";
                         line = br.readLine();
                         for (int i = 0; i < 2; i++) {
                             postContents += line + "\n";
                             line = br.readLine();
                         }
                         postContents += "Upvotes: " + line + "  ";
-                        postContents += "Downvotes: " + br.readLine() + "\n\n";
-                        newsFeed.append(postContents);
+                        postContents += "Downvotes: " + br.readLine() + "\n +=============================+ \n";
                     }
-
+                    newsFeed.append(postContents);
                 } catch(IOException e){
                     e.printStackTrace();
                 }
@@ -237,7 +261,8 @@ public class ClientGUI implements Runnable {
 
     private void newsFeedPopulateOnStartup() {
         String folderPath = "posts";
-
+        userNewsFeed.clearFeed();
+        newsFeed.setText("");
         try (Stream<Path> paths = Files.walk(Path.of(folderPath))) {
             paths.filter(Files::isRegularFile).forEach(filePath -> {
                         try (BufferedReader br = new BufferedReader(new FileReader(filePath.toFile()))) {
@@ -249,17 +274,17 @@ public class ClientGUI implements Runnable {
                             }
 
                             if (fileInfo.isEmpty() || fileInfo.equals(",")) {
-                                System.out.println("Empty file!");
+                                System.out.println("=/asce");
                             } else {
                                 String[] fileInfoSplit = fileInfo.split(",");
 
-                                User foundUser = new User("blank", "blank", "blank");
+                                User foundUser = null;
                                 for (User user : centralUserDatabase.getUsers()) {
                                     if (user.getUsername().equals(fileInfoSplit[1])) {
                                         foundUser = user;
                                     }
                                 }
-                                PostClass postToAdd = new PostClass(foundUser, fileInfoSplit[2], fileInfoSplit[3], 0 , 0);
+                                PostClass postToAdd = new PostClass(Integer.parseInt(fileInfoSplit[0]), foundUser.getUsername(), fileInfoSplit[2], fileInfoSplit[3], 0 , 0);
                                 postToAdd.filename = String.valueOf(filePath);
                                 userNewsFeed.addPost(postToAdd);
                             }
@@ -383,36 +408,12 @@ public class ClientGUI implements Runnable {
         mainMenuFrame.setBackground(Color.white);
         mainMenuFrame.setSize(1000,750);
 
-        JLabel upvoteDownvoteHelperText = new JLabel("Put the ID of a post here, then choose to upvote or downvote.");
-        upvoteDownvoteInputIDField = new JTextField(2);
-        upvoteDownvoteInputIDField.setFont(new Font("Serif", Font.BOLD, 15));
-
-        JLabel openCommentsHelperText = new JLabel("Put the ID of a post here to open its comments.");
-        openCommentsInputIDField = new JTextField(2);
-        openCommentsInputIDField.setFont(new Font("Serif", Font.BOLD, 15));
-
-        upvoteButton = new JButton("Upvote");
-        upvoteButton.addActionListener(actionListener);
-        downvoteButton = new JButton("Downvote");
-        downvoteButton.addActionListener(actionListener);
-        openCommentsButton = new JButton("Open Comments");
-        openCommentsButton.addActionListener(actionListener);
-
         JPanel mainMenuLeftFriendList = new JPanel();
-        mainMenuLeftFriendList.setSize(100,100);
-        mainMenuLeftFriendList.setLayout(new BoxLayout(mainMenuLeftFriendList, BoxLayout.PAGE_AXIS));
         friendList = new JTextArea();
         friendList.setText("Friends List:");
         friendList.setEditable(false);
         friendList.setFont(new Font("Serif", Font.BOLD, 35));
         mainMenuLeftFriendList.add(friendList);
-        mainMenuLeftFriendList.add(upvoteDownvoteHelperText);
-        mainMenuLeftFriendList.add(upvoteDownvoteInputIDField);
-        mainMenuLeftFriendList.add(upvoteButton);
-        mainMenuLeftFriendList.add(downvoteButton);
-        mainMenuLeftFriendList.add(openCommentsHelperText);
-        mainMenuLeftFriendList.add(openCommentsInputIDField);
-        mainMenuLeftFriendList.add(openCommentsButton);
         mainMenuFrame.add(mainMenuLeftFriendList, BorderLayout.WEST);
 
         userSearchInput = new JTextField(10);
@@ -494,7 +495,7 @@ public class ClientGUI implements Runnable {
         otherProfileMainMenuButton.addActionListener(actionListener);
         block = new JButton("Block");
         block.addActionListener(actionListener);
-        friend = new JButton("Friend");
+        friend = new JButton(friendButtonContents);
         friend.addActionListener(actionListener);
 
         JPanel otherProfileNamePanel = new JPanel();

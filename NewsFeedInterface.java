@@ -10,7 +10,6 @@ import java.util.ArrayList;
 public interface NewsFeedInterface
 {
 
-    void readPostsFromFile(String filename);
 
     void displayFeed();
 
@@ -25,5 +24,7 @@ public interface NewsFeedInterface
     ArrayList<PostClass> getFriendPosts();
 
     ArrayList<PostClass> getHiddenPosts();
+
+    void clearFeed();
 
 }
